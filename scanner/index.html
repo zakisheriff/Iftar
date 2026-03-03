@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iftar '26</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+    <style>
+        /* ── RESET & BASE ─────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #3b6b58;
+            /* Theme Green */
+            --primary-light: #528a74;
+            --primary-dim: rgba(59, 107, 88, 0.15);
+            --bg: #eae3d9;
+            /* Theme Beige */
+            --bg-card: #f5f0eb;
+            /* Lighter Beige */
+            --text: #1a2f26;
+            /* Dark Greenish Text */
+            --muted: #5a7368;
+            --success: #15803d;
+            --error: #b91c1c;
+            --warning: #b45309;
+            --radius: 35px;
+            /* Large border radius as requested */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* ── BACKGROUND ORBS ──────────────────────────────── */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 107, 88, 0.15), transparent 70%);
+            top: -150px;
+            right: -150px;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(200, 180, 150, 0.15), transparent 70%);
+            bottom: 0;
+            left: -100px;
+        }
+
+        /* ── LAYOUT ───────────────────────────────────────── */
+        .page {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 480px;
+            padding: 24px 16px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        /* ── HEADER ───────────────────────────────────────── */
+        header {
+            text-align: center;
+        }
+
+        .brand-icon {
+            margin-bottom: 12px;
+            color: var(--primary);
+            display: flex;
+            justify-content: center;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .tagline {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin-top: 6px;
+        }
+
+        .theme-desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 8px;
+            line-height: 1.5;
+            padding: 0 10px;
+        }
+
+        /* ── CAMERA CARD ──────────────────────────────────── */
+        .camera-card {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--primary-dim);
+            border-radius: var(--radius);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(59, 107, 88, 0.08);
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 100%;
+            background: #000;
+            overflow: hidden;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        #video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        /* Scan frame overlay */
+        .scan-frame {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .frame-box {
+            width: 60%;
+            height: 60%;
+            position: relative;
+        }
+
+        .frame-box::before,
+        .frame-box::after,
+        .frame-corner-br,
+        .frame-corner-bl {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-color: rgba(255, 255, 255, 0.8);
+            border-style: solid;
+        }
+
+        .frame-box::before {
+            top: 0;
+            left: 0;
+            border-width: 4px 0 0 4px;
+            border-radius: 12px 0 0 0;
+        }
+
+        .frame-box::after {
+            top: 0;
+            right: 0;
+            border-width: 4px 4px 0 0;
+            border-radius: 0 12px 0 0;
+        }
+
+        .frame-corner-br {
+            bottom: 0;
+            right: 0;
+            border-width: 0 4px 4px 0;
+            border-radius: 0 0 12px 0;
+        }
+
+        .frame-corner-bl {
+            bottom: 0;
+            left: 0;
+            border-width: 0 0 4px 4px;
+            border-radius: 0 0 0 12px;
+        }
+
+        /* Scanning line */
+        .scan-line {
+            position: absolute;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+            top: 20%;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+            animation: scan 2.5s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 20%;
+            }
+
+            50% {
+                top: 80%;
+            }
+
+            100% {
+                top: 20%;
+            }
+        }
+
+        /* Loading Overlay inside video frame */
+        #loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 10;
+        }
+
+        #loading-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            animation: spin-anim 1s linear infinite;
+            color: #fff;
+        }
+
+        @keyframes spin-anim {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Result Overlay */
+        #result-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            backdrop-filter: blur(8px);
+            transition: opacity 0.3s;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        #result-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .result-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .result-label {
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            padding: 0 20px;
+            color: #fff;
+        }
+
+        .result-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+        }
+
+        /* State colour themes */
+        #result-overlay.success {
+            background: rgba(21, 128, 61, 0.9);
+        }
+
+        #result-overlay.used {
+            background: rgba(185, 28, 28, 0.9);
+        }
+
+        #result-overlay.invalid {
+            background: rgba(180, 83, 9, 0.9);
+        }
+
+        /* Status Banner */
+        .status-bar {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-card);
+            border-bottom-left-radius: var(--radius);
+            border-bottom-right-radius: var(--radius);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--primary);
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(0.7);
+            }
+        }
+
+        .status-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* ── STATS STRIP ──────────────────────────────────── */
+        .stats-strip {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--primary-dim);
+            border-radius: var(--radius);
+            padding: 20px 8px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(59, 107, 88, 0.04);
+        }
+
+        .stat-num {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .stat-num.ok {
+            color: var(--success);
+        }
+
+        .stat-num.dup {
+            color: var(--error);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .stat-label-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 2px;
+            opacity: 0.7;
+        }
+
+        .stat-card.clickable {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stat-card.clickable:hover {
+            transform: translateY(-2px);
+            background: var(--bg);
+            border-color: var(--primary);
+        }
+
+        .stat-card.active {
+            box-shadow: 0 0 0 2px var(--primary);
+            background: var(--bg);
+        }
+
+        /* ── SEARCH & ATTENDANCE LIST ─────────────────────── */
+        .search-container {
+            width: 100%;
+            margin-top: 12px;
+            position: relative;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            color: var(--muted);
+        }
+
+        #student-search {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--primary-dim);
+            border-radius: 20px;
+            padding: 12px 16px 12px 42px;
+            color: var(--text);
+            font-size: 16px;
+            /* Set to 16px to prevent iOS auto-zoom */
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        #student-search:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(59, 107, 88, 0.08);
+        }
+
+        .attendance-list-card {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--primary-dim);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(59, 107, 88, 0.04);
+        }
+
+        .list-header {
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            border-bottom: 1px solid var(--primary-dim);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sync-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .sync-btn:hover {
+            background: var(--primary-dim);
+        }
+
+        .sync-btn.spinning {
+            animation: spin-anim 1s linear infinite;
+        }
+
+        .student-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .student-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--primary-dim);
+            transition: background 0.2s;
+        }
+
+        .student-item:hover {
+            background: rgba(59, 107, 88, 0.02);
+        }
+
+        .student-item:last-child {
+            border-bottom: none;
+        }
+
+        .student-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-admitted {
+            background: var(--success);
+        }
+
+        .status-pending {
+            background: var(--muted);
+            opacity: 0.3;
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .student-email {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
+            word-break: break-all;
+        }
+
+        .mark-btn {
+            background: var(--primary-dim);
+            color: var(--primary);
+            border: 1px solid var(--primary-dim);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .mark-btn:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .list-empty {
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+            padding: 40px 20px;
+        }
+
+        /* ── LOG ──────────────────────────────────────────── */
+        .log-card {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--primary-dim);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(59, 107, 88, 0.04);
+        }
+
+        .log-header {
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            border-bottom: 1px solid var(--primary-dim);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .log-list {
+            max-height: 240px;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .log-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .log-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .log-list::-webkit-scrollbar-thumb {
+            background: var(--primary-dim);
+            border-radius: 2px;
+        }
+
+        .log-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--primary-dim);
+            font-size: 14px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .log-badge.success {
+            background: var(--success);
+        }
+
+        .log-badge.used {
+            background: var(--error);
+        }
+
+        .log-badge.invalid {
+            background: var(--warning);
+        }
+
+        .log-info {
+            flex: 1;
+        }
+
+        .log-name {
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .log-time {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .log-empty {
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+            padding: 30px;
+        }
+
+        /* ── SETUP BANNER ─────────────────────────────────── */
+        #setup-banner {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--primary-dim);
+            border-radius: var(--radius);
+            padding: 24px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text);
+            box-shadow: 0 10px 30px rgba(59, 107, 88, 0.06);
+        }
+
+        .setup-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        #setup-banner code {
+            background: var(--bg);
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 12px;
+            word-break: break-all;
+            color: var(--primary);
+        }
+
+        #setup-banner input {
+            margin-top: 16px;
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--primary-dim);
+            border-radius: 20px;
+            padding: 16px 20px;
+            color: var(--text);
+            font-size: 16px;
+            /* 16px text input font as requested */
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        #setup-banner input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-dim);
+        }
+
+        #save-url-btn {
+            margin-top: 16px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 16px 24px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        #save-url-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .reset-setup-btn {
+            position: absolute;
+            top: 24px;
+            right: 16px;
+            background: rgba(185, 28, 28, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(185, 28, 28, 0.2);
+            padding: 8px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: none;
+            /* Hidden by default */
+            z-index: 10;
+        }
+
+        .reset-setup-btn:hover {
+            background: var(--error);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* ── FOOTER ───────────────────────────────────────── */
+        footer {
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <div class="page">
+
+        <!-- HEADER -->
+        <header>
+            <button id="reset-setup-btn" class="reset-setup-btn" onclick="resetSetup()">Reset Setup</button>
+            <div class="brand-icon">
+                <img src="assets/logo.PNG" alt="Iftar 2026 Logo"
+                    style="height: 120px; width: auto; object-fit: contain;">
+            </div>
+
+            <p class="tagline">Attendance Management System</p>
+            <p class="theme-desc">Scan QR codes or search the directory to mark guest admissions.</p>
+        </header>
+
+        <!-- SETUP BANNER -->
+        <div id="setup-banner">
+            <div class="setup-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
+                </svg>
+                One-time Setup Required
+            </div>
+            Paste your Google Apps Script Web App URL below and tap Save.
+            <input id="api-url-input" type="url" placeholder="https://script.google.com/macros/s/..." />
+            <button id="save-url-btn">Save & Start Scanning</button>
+        </div>
+
+        <!-- CAMERA CARD -->
+        <div class="camera-card" id="camera-card" style="display:none;">
+            <div class="video-wrapper">
+                <video id="video" autoplay muted playsinline></video>
+                <canvas id="canvas"></canvas>
+
+                <div class="scan-frame">
+                    <div class="frame-box">
+                        <div class="frame-corner-br"></div>
+                        <div class="frame-corner-bl"></div>
+                    </div>
+                </div>
+
+                <div class="scan-line"></div>
+
+                <!-- Loading overlay inside video frame -->
+                <div id="loading-overlay">
+                    <svg class="spinner" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                    </svg>
+                </div>
+
+                <!-- Result overlay -->
+                <div id="result-overlay">
+                    <div class="result-icon-wrapper">
+                        <svg id="result-icon-svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></svg>
+                    </div>
+                    <div class="result-label" id="result-label"></div>
+                    <div class="result-name" id="result-name"></div>
+                </div>
+            </div>
+
+            <!-- Status bar -->
+            <div class="status-bar" id="status-bar">
+                <div class="status-dot" id="status-dot"></div>
+                <span class="status-text" id="status-text">Point camera at student's QR code</span>
+            </div>
+        </div>
+
+        <!-- STATS STRIP -->
+        <div class="stats-strip" id="stats-strip" style="display:none;">
+            <div class="stat-card clickable active" onclick="filterList('all', this)">
+                <div class="stat-num" id="stat-total">0</div>
+                <div class="stat-label">Total</div>
+                <div class="stat-label-sub">Registered</div>
+            </div>
+            <div class="stat-card clickable" onclick="filterList('success', this)">
+                <div class="stat-num ok" id="stat-ok">0</div>
+                <div class="stat-label">Admitted</div>
+                <div class="stat-label-sub">Checked In</div>
+            </div>
+            <div class="stat-card clickable" onclick="filterList('duplicate', this)">
+                <div class="stat-num dup" id="stat-dup">0</div>
+                <div class="stat-label">Pending</div>
+                <div class="stat-label-sub">Remaining</div>
+            </div>
+        </div>
+
+        <!-- SEARCH BAR -->
+        <div class="search-container" id="search-container" style="display:none;">
+            <div class="search-input-wrapper">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="student-search" placeholder="Search students by name..."
+                    oninput="onSearchInput()">
+            </div>
+        </div>
+
+        <!-- MASTER LIST -->
+        <div class="attendance-list-card" id="master-list-card" style="display:none;">
+            <div class="list-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Master Attendance
+                </div>
+                <button class="sync-btn" id="sync-btn" onclick="fetchMasterList()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 4v6h-6"></path>
+                        <path d="M1 20v-6h6"></path>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="student-list" id="student-list">
+                <div class="list-empty">Syncing data...</div>
+            </div>
+        </div>
+
+        <!-- LIVE LOG -->
+        <div class="log-card" id="log-card" style="display:none;">
+            <div class="log-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+                Recent Scans
+            </div>
+            <div class="log-list" id="log-list">
+                <div class="log-empty">No scans yet.</div>
+            </div>
+        </div>
+
+        <footer>Scanner works entirely offline — only the validation call needs internet.</footer>
+
+    </div>
+
+    <script>
+        // ================================================================
+        //  CONFIG — this is saved in localStorage after the first setup
+        // ================================================================
+        var APPS_SCRIPT_URL = localStorage.getItem("iftar_api_url") || "";
+        var RESET_DELAY_MS = 3000;   // how long to show result before re-scanning
+
+        // ================================================================
+        //  STATE
+        // ================================================================
+        var scanning = false;
+        var processing = false;
+        var stats = { total: 0, ok: 0, dup: 0 };
+        var logEntries = [];
+
+        // ================================================================
+        //  SETUP BANNER
+        // ================================================================
+        var setupBanner = document.getElementById("setup-banner");
+        var apiInput = document.getElementById("api-url-input");
+        var saveUrlBtn = document.getElementById("save-url-btn");
+        var cameraCard = document.getElementById("camera-card");
+        var statsStrip = document.getElementById("stats-strip");
+        var logCard = document.getElementById("log-card");
+        var loadingOverlay = document.getElementById("loading-overlay");
+        var masterListCard = document.getElementById("master-list-card"); // Added this line
+
+        apiInput.value = APPS_SCRIPT_URL;
+
+        if (APPS_SCRIPT_URL) {
+            showScanner();
+        }
+
+        saveUrlBtn.addEventListener("click", function () {
+            var url = apiInput.value.trim();
+            if (!url || !url.startsWith("https://script.google.com")) {
+                alert("Please enter a valid Apps Script Web App URL.");
+                return;
+            }
+            localStorage.setItem("iftar_api_url", url);
+            APPS_SCRIPT_URL = url;
+            showScanner();
+        });
+
+        function showScanner() {
+            if (APPS_SCRIPT_URL) {
+                setupBanner.style.display = 'none';
+                cameraCard.style.display = 'block';
+                statsStrip.style.display = 'grid'; // Changed from 'flex' to 'grid' to match original
+                logCard.style.display = 'block'; // Added this line
+                document.getElementById("search-container").style.display = 'block'; // Added this line
+                masterListCard.style.display = 'block';
+                document.getElementById("reset-setup-btn").style.display = 'block';
+                startCamera();
+                fetchMasterList();
+            } else {
+                setupBanner.style.display = 'block';
+                cameraCard.style.display = 'none';
+                statsStrip.style.display = 'none';
+                logCard.style.display = 'none'; // Added this line
+                document.getElementById("search-container").style.display = 'none'; // Added this line
+                masterListCard.style.display = 'none';
+                document.getElementById("reset-setup-btn").style.display = 'none';
+            }
+        }
+
+        function resetSetup() {
+            if (confirm("Are you sure you want to reset? This will clear your saved Google Script URL.")) {
+                localStorage.removeItem("iftar_api_url");
+                window.location.reload();
+            }
+        }
+
+        // ================================================================
+        //  CAMERA + QR SCANNING
+        // ================================================================
+        var video = document.getElementById("video");
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        var animId;
+
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                    video.play();
+                    scanning = true;
+                    requestAnimationFrame(tick);
+                })
+                .catch(function (err) {
+                    document.getElementById("status-text").textContent = "Camera access denied.";
+                    document.getElementById("status-dot").style.background = "var(--error)";
+                });
+        }
+
+        function tick() {
+            if (!scanning) return;
+
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.height = video.videoHeight;
+                canvas.width = video.videoWidth;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert"
+                });
+
+                if (code && !processing) {
+                    processing = true;
+                    validateToken(code.data);
+                }
+            }
+            animId = requestAnimationFrame(tick);
+        }
+
+        // ================================================================
+        //  TOKEN VALIDATION
+        // ================================================================
+        function validateToken(token) {
+            // Show loading spinner over the scanner immediately
+            loadingOverlay.classList.add("show");
+
+            fetch(APPS_SCRIPT_URL + "?token=" + encodeURIComponent(token))
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    loadingOverlay.classList.remove("show");
+
+                    if (data.status === "success") {
+                        showResult("success", "success", "Admitted! Welcome.", data.name);
+                        addLog("success", data.name || "Student", "Admitted");
+                        stats.total++; stats.ok++;
+                        fetchMasterList(); // Refresh list to show them as admitted
+                    } else if (data.status === "already_used") {
+                        showResult("used", "used", "Already Checked In", data.name);
+                        addLog("used", data.name || "Unknown", "Duplicate scan");
+                        stats.total++; stats.dup++;
+                    } else {
+                        showResult("invalid", "invalid", "Invalid QR Code", "Token not recognised");
+                        addLog("invalid", "Unknown", "Invalid QR");
+                        stats.total++; stats.dup++;
+                    }
+                    updateStats();
+                })
+                .catch(function () {
+                    loadingOverlay.classList.remove("show");
+                    showResult("invalid", "invalid", "Network Error", "Check your internet connection");
+                    processing = false;
+                });
+        }
+
+        // ================================================================
+        //  UI HELPERS
+        // ================================================================
+        var overlay = document.getElementById("result-overlay");
+        var resultIcon = document.getElementById("result-icon-svg");
+        var resultLabel = document.getElementById("result-label");
+        var resultName = document.getElementById("result-name");
+
+        function showResult(type, iconType, label, name) {
+            overlay.className = "show " + type;
+
+            // Set SVG dynamically
+            if (iconType === "success") {
+                resultIcon.innerHTML = '<path d="M20 6L9 17l-5-5"></path>';
+            } else if (iconType === "used") {
+                resultIcon.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
+            } else {
+                resultIcon.innerHTML = '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>';
+            }
+
+            resultLabel.textContent = label;
+            resultName.textContent = name || "";
+
+            setTimeout(function () {
+                overlay.className = "";
+                processing = false;
+            }, RESET_DELAY_MS);
+        }
+
+        function updateStats() {
+            var total = masterStudentList.length;
+            var ok = masterStudentList.filter(function (s) { return s.attended; }).length;
+            var pending = total - ok;
+
+            document.getElementById("stat-total").textContent = total;
+            document.getElementById("stat-ok").textContent = ok;
+            document.getElementById("stat-dup").textContent = pending;
+        }
+
+        function addLog(badgeType, name, outcome) {
+            var now = new Date();
+            var timeStr = now.getHours().toString().padStart(2, "0") + ":" +
+                now.getMinutes().toString().padStart(2, "0") + ":" +
+                now.getSeconds().toString().padStart(2, "0");
+
+            var logList = document.getElementById("log-list");
+            var empty = logList.querySelector(".log-empty");
+            if (empty) logList.removeChild(empty);
+
+            var svgContent = "";
+            if (badgeType === "success") {
+                svgContent = '<path d="M20 6L9 17l-5-5"></path>';
+            } else if (badgeType === "used") {
+                svgContent = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
+            } else {
+                svgContent = '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>';
+            }
+
+            var item = document.createElement("div");
+            item.className = "log-item";
+            item.innerHTML =
+                '<div class="log-badge ' + badgeType + '">' +
+                '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' + svgContent + '</svg>' +
+                '</div>' +
+                '<div class="log-info">' +
+                '<div class="log-name">' + escapeHtml(name) + '</div>' +
+                '<div class="log-time">' + outcome + ' &middot; ' + timeStr + '</div>' +
+                '</div>';
+
+            logList.insertBefore(item, logList.firstChild);
+
+            while (logList.children.length > 50) {
+                logList.removeChild(logList.lastChild);
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        // ================================================================
+        //  MASTER LIST & SEARCH LOGIC
+        // ================================================================
+        var masterStudentList = [];
+        var currentFilter = 'all';
+
+        function fetchMasterList() {
+            var syncBtn = document.getElementById("sync-btn");
+            if (syncBtn) syncBtn.classList.add("spinning");
+
+            var separator = APPS_SCRIPT_URL.indexOf('?') !== -1 ? '&' : '?';
+            var url = APPS_SCRIPT_URL + separator + "action=getList&t=" + new Date().getTime();
+
+            fetch(url)
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (syncBtn) syncBtn.classList.remove("spinning");
+                    if (res && res.status === "success") {
+                        masterStudentList = res.data || [];
+                        renderStudentList();
+                        updateStats(); // Also update the top boxes
+                    } else {
+                        console.error("Sync error:", res ? res.message : "Unknown error");
+                    }
+                })
+                .catch(function (err) {
+                    console.error("Fetch error:", err);
+                    if (syncBtn) syncBtn.classList.remove("spinning");
+                    var listEl = document.getElementById("student-list");
+                    if (listEl) listEl.innerHTML = '<div class="list-empty">Sync failed. Check your internet or Script URL.</div>';
+                });
+        }
+
+        function renderStudentList() {
+            var listEl = document.getElementById("student-list");
+            var searchInput = document.getElementById("student-search");
+            var searchVal = (searchInput ? searchInput.value : "").toLowerCase().trim();
+
+            var filtered = (masterStudentList || []).filter(function (s) {
+                var name = (s.name || "").toLowerCase();
+                var email = (s.email || "").toLowerCase();
+                var matchesSearch = name.indexOf(searchVal) !== -1 || email.indexOf(searchVal) !== -1;
+
+                var matchesFilter = true;
+                if (currentFilter === 'success') matchesFilter = (s.attended === true);
+                if (currentFilter === 'duplicate') matchesFilter = (s.attended === false);
+
+                return matchesSearch && matchesFilter;
+            });
+
+            if (filtered.length === 0) {
+                var emptyMsg = "No students found.";
+                if (searchVal) emptyMsg = "No matches for '" + escapeHtml(searchVal) + "'";
+                else if (currentFilter === 'success') emptyMsg = "No one has been admitted yet.";
+                else if (currentFilter === 'duplicate') emptyMsg = "Everyone has been admitted!";
+
+                listEl.innerHTML = '<div class="list-empty">' + emptyMsg + '</div>';
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(function (s) {
+                var statusText = s.attended ? 'Admitted' : 'Pending';
+
+                return '<div class="student-item">' +
+                    '<div class="student-status-dot ' + (s.attended ? 'status-admitted' : 'status-pending') + '"></div>' +
+                    '<div class="student-info">' +
+                    '<div class="student-name">' + escapeHtml(s.name) + '</div>' +
+                    '<div class="student-email">' + statusText + ' &middot; ' + escapeHtml(s.email) + '</div>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+
+
+        function onSearchInput() {
+            renderStudentList();
+        }
+
+        function filterList(type, element) {
+            currentFilter = type;
+
+            // UI Toggle
+            var cards = document.querySelectorAll('.stat-card');
+            cards.forEach(function (c) { c.classList.remove('active'); });
+            element.classList.add('active');
+
+            renderStudentList();
+        }
+    </script>
+</body>
+
+</html>
