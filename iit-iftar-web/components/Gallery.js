@@ -147,7 +147,15 @@ export default function Gallery({ year, staticImages }) {
                 document.body.style.width = '';
                 document.body.style.overflow = '';
                 document.documentElement.style.overflow = '';
+
+                // Temporarily disable smooth scrolling to snap instantly
+                const origBehavior = document.documentElement.style.scrollBehavior;
+                document.documentElement.style.scrollBehavior = 'auto';
                 window.scrollTo(0, currentScrollY);
+                // Restore original behavior after the frame renders
+                requestAnimationFrame(() => {
+                    document.documentElement.style.scrollBehavior = origBehavior;
+                });
             };
         }
     }, [lightboxIndex]);
