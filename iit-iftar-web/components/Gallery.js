@@ -6,20 +6,28 @@ export default function Gallery({ year, staticImages }) {
     const [photos, setPhotos] = useState([]);
     const [nextPageToken, setNextPageToken] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [loadingMore, setLoadingMore] = useState(false);
+    const [loadingAction, setLoadingAction] = useState('none'); // 'none', 'more', 'all'
     const [error, setError] = useState(null);
     const [useDrive, setUseDrive] = useState(false);
+    const [totalPhotos, setTotalPhotos] = useState(null);
     const [lightboxIndex, setLightboxIndex] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState('');
 
-    // On mount: try to load from Drive API; fall back to staticImages
+    // On mount or search: try to load from Drive API; fall back to staticImages
     useEffect(() => {
         if (!year) return;
         setLoading(true);
-        fetch(`/api/gallery/${year}`)
+
+        let url = `/api/gallery/${year}`;
+        if (searchQuery) {
+            url += `?search=${encodeURIComponent(searchQuery)}`;
+        }
+
+        fetch(url)
             .then((r) => r.json())
             .then((data) => {
                 if (data.error) {
-                    // API not configured — fall back to placeholder images
                     setUseDrive(false);
                     setPhotos(
                         (staticImages || []).map((src, i) => ({
@@ -33,11 +41,11 @@ export default function Gallery({ year, staticImages }) {
                     setUseDrive(true);
                     setPhotos(data.photos || []);
                     setNextPageToken(data.nextPageToken || null);
+                    if (data.totalCount !== undefined) setTotalPhotos(data.totalCount);
                 }
                 setLoading(false);
             })
             .catch(() => {
-                // Network error — fall back
                 setUseDrive(false);
                 setPhotos(
                     (staticImages || []).map((src, i) => ({
@@ -49,19 +57,45 @@ export default function Gallery({ year, staticImages }) {
                 );
                 setLoading(false);
             });
-    }, [year, staticImages]);
+    }, [year, staticImages, searchQuery]);
 
     const loadMore = () => {
-        if (!nextPageToken || loadingMore) return;
-        setLoadingMore(true);
-        fetch(`/api/gallery/${year}?pageToken=${nextPageToken}`)
+        if (!nextPageToken || loadingAction !== 'none') return;
+        setLoadingAction('more');
+
+        let url = `/api/gallery/${year}?pageToken=${nextPageToken}`;
+        if (searchQuery) {
+            url += `&search=${encodeURIComponent(searchQuery)}`;
+        }
+
+        fetch(url)
             .then((r) => r.json())
             .then((data) => {
                 setPhotos((prev) => [...prev, ...(data.photos || [])]);
                 setNextPageToken(data.nextPageToken || null);
-                setLoadingMore(false);
+                setLoadingAction('none');
             })
-            .catch(() => setLoadingMore(false));
+            .catch(() => setLoadingAction('none'));
+    };
+
+    const loadAll = () => {
+        if (!nextPageToken || loadingAction !== 'none') return;
+        setLoadingAction('all');
+
+        // Use query params to tell the backend to run the fetchAll loop
+        let url = `/api/gallery/${year}?fetchAll=true`;
+        if (searchQuery) {
+            url += `&search=${encodeURIComponent(searchQuery)}`;
+        }
+
+        fetch(url)
+            .then((r) => r.json())
+            .then((data) => {
+                setPhotos(data.photos || []);
+                setNextPageToken(null);
+                setLoadingAction('none');
+            })
+            .catch(() => setLoadingAction('none'));
     };
 
     // ── Lightbox ──
@@ -87,7 +121,6 @@ export default function Gallery({ year, staticImages }) {
         return () => window.removeEventListener('keydown', handler);
     }, [lightboxIndex, prev, next]);
 
-    // Preload adjacent images so navigation feels instant
     useEffect(() => {
         if (lightboxIndex === null || photos.length === 0) return;
         const preload = (idx) => {
@@ -98,7 +131,33 @@ export default function Gallery({ year, staticImages }) {
         preload((lightboxIndex - 1 + photos.length) % photos.length);
     }, [lightboxIndex, photos]);
 
-    if (loading) {
+    // Strong body lock for desktop trackpad zooming
+    useEffect(() => {
+        if (lightboxIndex !== null) {
+            const currentScrollY = window.scrollY;
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${currentScrollY}px`;
+            document.body.style.width = '100%';
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+
+            return () => {
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                document.body.style.overflow = '';
+                document.documentElement.style.overflow = '';
+                window.scrollTo(0, currentScrollY);
+            };
+        }
+    }, [lightboxIndex]);
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        setSearchQuery(searchInput.trim());
+    };
+
+    if (loading && !photos.length) {
         return (
             <div className={styles.loadingState}>
                 <div className={styles.spinner} />
@@ -111,7 +170,7 @@ export default function Gallery({ year, staticImages }) {
         return <div className={styles.errorState}>{error}</div>;
     }
 
-    if (photos.length === 0) {
+    if (photos.length === 0 && !searchQuery) {
         return (
             <div className={styles.emptyState}>
                 <p>Photos coming soon.</p>
@@ -121,60 +180,103 @@ export default function Gallery({ year, staticImages }) {
     }
 
     return (
-        <>
+        <div className={styles.galleryContainer}>
             {useDrive && (
-                <div className={styles.driveTag}>
-                    <svg width="14" height="14" viewBox="0 0 87.3 78" style={{ marginRight: 6, verticalAlign: 'middle' }}>
-                        <path fill="#0066da" d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3L27.5 53H0c0 1.55.4 3.1 1.2 4.5z" />
-                        <path fill="#00ac47" d="M43.65 25L29.9 0c-1.35.8-2.5 1.9-3.3 3.3L1.2 48.5A9 9 0 0 0 0 53h27.5z" />
-                        <path fill="#ea4335" d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 10.9z" />
-                        <path fill="#00832d" d="M43.65 25L57.4 0H29.9z" />
-                        <path fill="#2684fc" d="M59.8 53H87.3l-13.75-23.75A9 9 0 0 0 70.25 26H43.65L57.4 50.1z" />
-                        <path fill="#ffba00" d="M43.65 25L29.9 0H13.8l-9.9 17.15z" />
-                    </svg>
-                    Loaded from Google Drive · {photos.length} photos
+                <div className={styles.galleryHeader}>
+                    <div className={styles.driveTag}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6, verticalAlign: 'middle' }}>
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        {totalPhotos ? `Loaded ${photos.length} / ${totalPhotos} photos` : `Loaded ${photos.length} photos`}
+                    </div>
+
+                    <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
+                        <div className={styles.searchWrapper}>
+                            <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input
+                                type="text"
+                                placeholder="Search image name..."
+                                className={styles.searchInput}
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                            />
+                            {searchQuery && (
+                                <button type="button" className={styles.clearSearch} onClick={() => { setSearchInput(''); setSearchQuery(''); }}>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                                        <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                                    </svg>
+                                </button>
+                            )}
+                            <button type="submit" className={styles.searchButton}>
+                                Search
+                            </button>
+                        </div>
+                    </form>
                 </div>
             )}
 
-            <div className={styles.grid}>
-                {photos.map((photo, i) => (
-                    <button
-                        key={photo.id}
-                        className={styles.thumb}
-                        onClick={() => openLightbox(i)}
-                        aria-label={`Open photo ${i + 1}`}
-                    >
-                        {/* Use regular <img> for Drive thumbnails — Next/Image requires configured remote domains */}
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                            src={photo.thumb}
-                            alt={photo.name}
-                            className={styles.thumbImg}
-                            loading="lazy"
-                            onError={(e) => { e.target.style.opacity = '0'; }}
-                        />
-                        <div className={styles.thumbOverlay}>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                                <line x1="11" y1="8" x2="11" y2="14" /><line x1="8" y1="11" x2="14" y2="11" />
-                            </svg>
-                        </div>
+            {photos.length === 0 && searchQuery ? (
+                <div className={styles.emptySearch}>
+                    <p>No photos found matching "{searchQuery}".</p>
+                    <button className={styles.searchButton} onClick={() => { setSearchInput(''); setSearchQuery(''); }}>
+                        Clear Search
                     </button>
-                ))}
-            </div>
+                </div>
+            ) : (
+                <div className={styles.grid}>
+                    {photos.map((photo, i) => (
+                        <button
+                            key={photo.id}
+                            className={styles.thumb}
+                            onClick={() => openLightbox(i)}
+                            aria-label={`Open photo ${i + 1}`}
+                        >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                                src={photo.thumb}
+                                alt={photo.name}
+                                className={styles.thumbImg}
+                                loading="lazy"
+                                onError={(e) => { e.target.style.opacity = '0'; }}
+                            />
+                            <div className={styles.thumbOverlay}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                    <line x1="11" y1="8" x2="11" y2="14" /><line x1="8" y1="11" x2="14" y2="11" />
+                                </svg>
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            )}
 
-            {/* Load More */}
-            {nextPageToken && (
+            {/* Load More & View All */}
+            {nextPageToken && !searchQuery && (
                 <div className={styles.loadMoreWrap}>
                     <button
                         className={styles.loadMoreBtn}
                         onClick={loadMore}
-                        disabled={loadingMore}
+                        disabled={loadingAction !== 'none'}
                     >
-                        {loadingMore ? (
-                            <><div className={styles.spinnerSm} /> Loading…</>
+                        {loadingAction === 'more' ? (
+                            <><span className={styles.spinnerSm} /> Loading…</>
                         ) : (
                             <>Load More Photos</>
+                        )}
+                    </button>
+                    <button
+                        className={styles.viewAllBtn}
+                        onClick={loadAll}
+                        disabled={loadingAction !== 'none'}
+                    >
+                        {loadingAction === 'all' ? (
+                            <><span className={styles.spinnerSm} /> Loading All…</>
+                        ) : (
+                            <>View All</>
                         )}
                     </button>
                 </div>
@@ -219,7 +321,6 @@ export default function Gallery({ year, staticImages }) {
                         </button>
 
                         <div className={styles.lbImgWrap}>
-                            {/* Blurred thumbnail — shows immediately since it's already cached */}
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 key={`blur-${photos[lightboxIndex].id}`}
@@ -228,7 +329,6 @@ export default function Gallery({ year, staticImages }) {
                                 aria-hidden="true"
                                 className={styles.lbBlur}
                             />
-                            {/* Full image — fades in on load */}
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 key={photos[lightboxIndex].id}
@@ -253,6 +353,6 @@ export default function Gallery({ year, staticImages }) {
 
                 </div>
             )}
-        </>
+        </div>
     );
 }

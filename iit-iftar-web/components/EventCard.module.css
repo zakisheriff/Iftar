@@ -41,6 +41,14 @@
     }
 }
 
+@media (max-width: 768px) {
+
+    .card,
+    .featured {
+        aspect-ratio: 1/1;
+    }
+}
+
 .card:hover {
     transform: translateY(-6px) scale(1.01);
     box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(201, 169, 110, 0.15);

@@ -21,16 +21,6 @@ export default function Home() {
             <Navbar />
 
             <main className={styles.main}>
-                {/* ── FIXED BACKGROUND ── */}
-                <div className={styles.pageBackground}>
-                    <div className={styles.heroBg}>
-                        <div className={styles.heroOrb1} />
-                        <div className={styles.heroOrb2} />
-                        <div className={styles.heroOrb3} />
-                        <div className={styles.heroPattern} />
-                    </div>
-                </div>
-
                 {/* ── HERO ── */}
                 <section className={styles.hero}>
 
@@ -73,9 +63,6 @@ export default function Home() {
                             </div>
                             <Link href="#events" className={styles.heroCta}>
                                 Explore the Archive
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M12 5v14" /><path d="M5 12l7 7 7-7" />
-                                </svg>
                             </Link>
                         </div>
                     </div>
@@ -147,10 +134,13 @@ export default function Home() {
                                 <p className={styles.aboutLabel}>About the Committee</p>
                                 <h2 className={styles.aboutTitle}>Built on Community,<br />Rooted in Tradition</h2>
                                 <p className={styles.aboutDesc}>
-                                    The IIT Iftar Committee was born from a simple desire — to create a space where students, faculty, and friends could gather during Ramadan, share a meal, and feel at home. What started as 120 people in an auditorium has grown into one of IIT's most cherished annual traditions.
+                                    The IIT Iftar Committee was born from a simple desire — to create a space where students, faculty, and friends could gather during Ramadan, share a meal, and feel at home. What started with just over a hundred people in an auditorium has blossomed into one of IIT's most cherished and anticipated annual traditions.
                                 </p>
                                 <p className={styles.aboutDesc}>
-                                    Each year, a dedicated team of volunteers plans every detail — from the décor and the food to the music and the theme — so that every guest leaves with a memory worth keeping.
+                                    Each year, a dedicated team of student volunteers plans every single detail — from the intricate décor and authentic cuisine to the live music and underlying theme — ensuring that every guest experiences the warmth of community.
+                                </p>
+                                <p className={styles.aboutDesc}>
+                                    <strong>This digital archive was proudly designed and developed by the IIT Iftar 2026 Committee</strong>, allowing everyone to look back at the beautiful evenings we've shared over the years. Some stories never fade; they just echo.
                                 </p>
                             </div>
                             <div className={styles.statsPanel}>

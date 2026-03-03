@@ -63,6 +63,28 @@
     opacity: 1;
 }
 
+.galleryContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.galleryHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-2);
+    padding-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+    .galleryHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+}
+
 /* ── Drive badge ── */
 .driveTag {
     display: inline-flex;
@@ -76,33 +98,146 @@
     background: rgba(201, 169, 110, 0.08);
     border: 1px solid rgba(201, 169, 110, 0.15);
     border-radius: 20px;
-    padding: 5px 14px;
-    margin-bottom: 20px;
+    padding: 6px 16px;
 }
 
-/* ── Load More ── */
+/* ── Search UI ── */
+.searchForm {
+    position: relative;
+    width: 320px;
+}
+
+@media (max-width: 768px) {
+    .searchForm {
+        width: 100%;
+    }
+}
+
+.searchWrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(13, 21, 17, 0.6);
+    border: 1px solid var(--border-2);
+    border-radius: 30px;
+    padding: 4px 6px;
+    transition: var(--transition);
+}
+
+.searchWrapper:focus-within {
+    border-color: rgba(201, 169, 110, 0.4);
+    box-shadow: 0 0 0 1px rgba(201, 169, 110, 0.1);
+    background: rgba(13, 21, 17, 0.9);
+}
+
+.searchIcon {
+    margin-left: 12px;
+    color: var(--text-3);
+}
+
+.searchInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 16px;
+    padding: 8px 12px;
+    outline: none;
+}
+
+.searchInput::placeholder {
+    color: var(--text-3);
+}
+
+.clearSearch {
+    background: transparent;
+    border: none;
+    color: var(--text-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 50%;
+    margin-right: 4px;
+    transition: var(--transition);
+}
+
+.clearSearch:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.searchButton {
+    background: rgba(201, 169, 110, 0.1);
+    color: var(--gold);
+    border: 1px solid rgba(201, 169, 110, 0.2);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.searchButton:hover {
+    background: var(--gold);
+    color: var(--ink);
+    border-color: var(--gold);
+}
+
+.emptySearch {
+    text-align: center;
+    padding: 60px 20px;
+    background: rgba(13, 21, 17, 0.5);
+    border: 1px dashed var(--border-2);
+    border-radius: 16px;
+    color: var(--text-2);
+    margin: 40px 0;
+}
+
+.emptySearch p {
+    margin-bottom: 24px;
+    font-size: 16px;
+}
+
+/* ── Load More & View All ── */
 .loadMoreWrap {
     margin-top: 32px;
     display: flex;
     justify-content: center;
+    gap: 16px;
 }
 
-.loadMoreBtn {
+.loadMoreBtn,
+.viewAllBtn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
-    background: rgba(201, 169, 110, 0.06);
-    border: 1px solid rgba(201, 169, 110, 0.2);
-    color: var(--gold);
     font-size: 13px;
     font-weight: 700;
     font-family: inherit;
     padding: 14px 36px;
     border-radius: 40px;
     cursor: pointer;
-    transition: var(--transition);
+    transition: background 0.3s var(--ease), border-color 0.3s var(--ease), color 0.3s var(--ease), transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
     text-transform: uppercase;
     letter-spacing: 1px;
+    min-width: 160px;
+}
+
+.loadMoreBtn {
+    background: rgba(201, 169, 110, 0.06);
+    border: 1px solid rgba(201, 169, 110, 0.2);
+    color: var(--gold);
+}
+
+.viewAllBtn {
+    background: transparent;
+    border: 1px solid rgba(240, 235, 227, 0.2);
+    color: var(--text-2);
 }
 
 .loadMoreBtn:hover:not(:disabled) {
@@ -113,7 +248,15 @@
     box-shadow: 0 8px 32px rgba(201, 169, 110, 0.25);
 }
 
-.loadMoreBtn:disabled {
+.viewAllBtn:hover:not(:disabled) {
+    background: rgba(240, 235, 227, 0.1);
+    color: var(--text);
+    border-color: rgba(240, 235, 227, 0.4);
+    transform: translateY(-2px);
+}
+
+.loadMoreBtn:disabled,
+.viewAllBtn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
 }
@@ -151,6 +294,7 @@
 }
 
 .spinnerSm {
+    display: inline-block;
     width: 16px;
     height: 16px;
     border: 2px solid rgba(255, 255, 255, 0.3);
@@ -169,13 +313,12 @@
 .lightbox {
     position: fixed;
     inset: 0;
-    width: 100vw;
-    height: 100vh;
     z-index: 1000;
     background: rgba(8, 14, 10, 0.97);
     display: flex;
     flex-direction: column;
     animation: lbIn 0.2s ease;
+    overscroll-behavior: none;
 }
 
 @keyframes lbIn {

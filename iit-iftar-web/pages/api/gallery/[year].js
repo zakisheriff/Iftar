@@ -3,7 +3,7 @@
 // The API key is kept server-side (never exposed in the browser).
 
 export default async function handler(req, res) {
-    const { year, pageToken } = req.query;
+    const { year, pageToken, search, fetchAll } = req.query;
     const apiKey = process.env.GOOGLE_DRIVE_API_KEY;
 
     if (!apiKey) {
@@ -26,31 +26,72 @@ export default async function handler(req, res) {
 
     try {
         // Only return image files, ordered by name, 50 per page
-        const params = new URLSearchParams({
-            key: apiKey,
-            q: `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`,
-            fields: "nextPageToken,files(id,name,mimeType,thumbnailLink,webContentLink)",
-            orderBy: "name",
-            pageSize: "50",
-        });
+        let q = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
 
-        if (pageToken) {
-            params.set("pageToken", pageToken);
+        if (search) {
+            // Clean the search string and prevent quotes breaking the query
+            const sanitizedSearch = search.replace(/'/g, "\\'");
+            q += ` and name contains '${sanitizedSearch}'`;
         }
 
-        const driveRes = await fetch(
-            `https://www.googleapis.com/drive/v3/files?${params.toString()}`
-        );
+        let totalCount = undefined;
 
-        if (!driveRes.ok) {
-            const err = await driveRes.json();
-            return res.status(driveRes.status).json({ error: err.error?.message || "Drive API error" });
+        // If it's the first page load and no search query, let's quickly count all the images
+        if (!pageToken && !search) {
+            totalCount = 0;
+            let countToken = null;
+            do {
+                const countParams = new URLSearchParams({
+                    key: apiKey,
+                    q: q,
+                    fields: "nextPageToken,files(id)",
+                    pageSize: "1000",
+                });
+                if (countToken) countParams.set("pageToken", countToken);
+                const countRes = await fetch(`https://www.googleapis.com/drive/v3/files?${countParams.toString()}`);
+                if (countRes.ok) {
+                    const countData = await countRes.json();
+                    totalCount += countData.files?.length || 0;
+                    countToken = countData.nextPageToken;
+                } else {
+                    break;
+                }
+            } while (countToken);
         }
 
-        const data = await driveRes.json();
+        let allFiles = [];
+        let currentToken = pageToken;
+
+        do {
+            const params = new URLSearchParams({
+                key: apiKey,
+                q: q,
+                fields: "nextPageToken,files(id,name,mimeType,thumbnailLink,webContentLink)",
+                orderBy: "name",
+                pageSize: fetchAll ? "1000" : "50",
+            });
+
+            if (currentToken) {
+                params.set("pageToken", currentToken);
+            }
+
+            const driveRes = await fetch(
+                `https://www.googleapis.com/drive/v3/files?${params.toString()}`
+            );
+
+            if (!driveRes.ok) {
+                const err = await driveRes.json();
+                return res.status(driveRes.status).json({ error: err.error?.message || "Drive API error" });
+            }
+
+            const data = await driveRes.json();
+            allFiles = allFiles.concat(data.files || []);
+            currentToken = data.nextPageToken;
+
+        } while (fetchAll && currentToken);
 
         // Build clean photo objects for the frontend
-        const photos = (data.files || []).map((file) => ({
+        const photos = allFiles.map((file) => ({
             id: file.id,
             // Proxied through our own server — no CORS, no cookie, no browser restrictions
             thumb: `/api/img/${file.id}?sz=w600`,
@@ -62,7 +103,8 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
             photos,
-            nextPageToken: data.nextPageToken || null,
+            nextPageToken: currentToken || null,
+            totalCount,
         });
     } catch (err) {
         return res.status(500).json({ error: err.message });
