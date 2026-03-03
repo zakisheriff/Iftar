@@ -1,17 +1,22 @@
+/* ══════════════════════════════════════
+   EVENT CARD — Cinematic Dark Style
+   ══════════════════════════════════════ */
+
 .card {
+    position: relative;
     display: block;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-    animation: fadeUp 0.6s ease both;
+    aspect-ratio: 4/5;
+    background: var(--ink-2);
+    border: 1px solid rgba(240, 235, 227, 0.06);
+    cursor: pointer;
     text-decoration: none;
-    color: inherit;
+    animation: cardIn 0.6s var(--ease-out) both;
+    transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease), border-color 0.45s var(--ease);
 }
 
-@keyframes fadeUp {
+@keyframes cardIn {
     from {
         opacity: 0;
         transform: translateY(24px);
@@ -23,111 +28,181 @@
     }
 }
 
-.card:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--accent);
+/* Featured: spans 2 columns */
+.featured {
+    grid-column: span 2;
+    aspect-ratio: 16/9;
 }
 
+@media (max-width: 1024px) {
+    .featured {
+        grid-column: span 1;
+        aspect-ratio: 4/5;
+    }
+}
+
+.card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(201, 169, 110, 0.15);
+    border-color: rgba(201, 169, 110, 0.15);
+}
+
+/* ── Image ── */
 .imageWrap {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    overflow: hidden;
-    background: #1a2f26;
+    position: absolute;
+    inset: 0;
 }
 
 .image {
     object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.7s var(--ease);
 }
 
 .card:hover .image {
     transform: scale(1.06);
 }
 
-.overlay {
+/* Rich dark gradient mask — creates depth for text readability */
+.imageMask {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 40%, rgba(26, 47, 38, 0.7) 100%);
+    background:
+        linear-gradient(to top,
+            rgba(10, 16, 13, 0.98) 0%,
+            rgba(10, 16, 13, 0.7) 40%,
+            rgba(10, 16, 13, 0.2) 70%,
+            transparent 100%);
+    transition: var(--transition);
 }
 
+.card:hover .imageMask {
+    background:
+        linear-gradient(to top,
+            rgba(10, 16, 13, 0.98) 0%,
+            rgba(10, 16, 13, 0.8) 50%,
+            rgba(10, 16, 13, 0.3) 75%,
+            transparent 100%);
+}
+
+/* ── Year badge ── */
 .yearBadge {
     position: absolute;
-    top: 16px;
-    left: 16px;
-    background: var(--accent, var(--primary));
-    color: #fff;
+    top: 20px;
+    right: 20px;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 600;
+    color: var(--gold);
+    background: rgba(13, 21, 17, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(201, 169, 110, 0.2);
     padding: 6px 14px;
-    border-radius: 30px;
-    letter-spacing: 0.5px;
+    border-radius: 40px;
+    letter-spacing: 1px;
     z-index: 2;
 }
 
+/* ── Body — overlaid at the bottom ── */
 .body {
-    padding: 24px;
-    position: relative;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 28px 28px 28px;
+    z-index: 2;
+    transform: translateY(4px);
+    transition: transform 0.4s var(--ease);
+}
+
+.card:hover .body {
+    transform: translateY(0);
 }
 
 .theme {
-    font-size: 11px;
+    display: inline-block;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--accent, var(--primary));
+    letter-spacing: 2.5px;
+    color: var(--gold);
     margin-bottom: 8px;
+    padding: 4px 10px;
+    background: rgba(201, 169, 110, 0.1);
+    border-radius: 20px;
+    border: 1px solid rgba(201, 169, 110, 0.15);
 }
 
 .title {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(22px, 2.5vw, 28px);
+    font-weight: 400;
     color: var(--text);
-    line-height: 1.25;
-    margin-bottom: 10px;
+    line-height: 1.2;
+    margin-bottom: 8px;
 }
 
 .quote {
     font-size: 13px;
-    color: var(--muted);
+    color: var(--text-2);
     line-height: 1.6;
-    margin-bottom: 20px;
     font-style: italic;
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease 0.05s, transform 0.35s ease 0.05s;
+}
+
+.card:hover .quote {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .meta {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-3);
+    font-weight: 500;
 }
 
-.metaItem {
-    display: flex;
+.dot {
+    opacity: 0.5;
+}
+
+.cta {
+    display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 12px;
-    font-weight: 600;
-    color: var(--muted);
-}
-
-.metaItem svg {
-    color: var(--accent, var(--primary));
+    font-weight: 700;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid rgba(201, 169, 110, 0.25);
+    padding: 7px 16px;
+    border-radius: 30px;
+    transition: var(--transition);
     flex-shrink: 0;
 }
 
-.arrow {
-    position: absolute;
-    bottom: 24px;
-    right: 24px;
-    color: var(--accent, var(--primary));
-    opacity: 0;
-    transform: translateX(-6px);
-    transition: var(--transition);
+.cta svg {
+    transition: transform 0.3s var(--ease);
 }
 
-.card:hover .arrow {
-    opacity: 1;
-    transform: translateX(0);
+.card:hover .cta {
+    background: var(--gold);
+    color: var(--ink);
+    border-color: var(--gold);
+}
+
+.card:hover .cta svg {
+    transform: translateX(3px);
 }

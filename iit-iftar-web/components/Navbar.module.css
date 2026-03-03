@@ -4,17 +4,22 @@
     left: 0;
     right: 0;
     z-index: 100;
-    padding: 0 24px;
-    background: rgba(234, 227, 217, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(59, 107, 88, 0.1);
+    padding: 20px 40px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav.scrolled {
+    padding: 14px 40px;
+    background: rgba(13, 21, 17, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(201, 169, 110, 0.08);
+    box-shadow: 0 4px 40px rgba(0, 0, 0, 0.4);
 }
 
 .inner {
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
-    height: 64px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -22,36 +27,87 @@
 
 .brand {
     display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    text-decoration: none;
 }
 
 .logo {
-    border-radius: 50%;
-    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(201, 169, 110, 0.3));
+}
+
+.brandText {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .brandName {
-    font-weight: 800;
-    font-size: 17px;
-    color: var(--primary);
-    letter-spacing: -0.3px;
+    display: none;
+}
+
+.brandSub {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 .links {
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: 8px;
 }
 
 .link {
     font-size: 14px;
-    font-weight: 600;
-    color: var(--muted);
+    font-weight: 500;
+    color: var(--text-2);
+    padding: 8px 16px;
+    border-radius: 40px;
     transition: var(--transition);
-    letter-spacing: 0.2px;
 }
 
 .link:hover {
-    color: var(--primary);
+    color: var(--text);
+    background: rgba(240, 235, 227, 0.06);
+}
+
+.ctaBtn {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+    border: 1px solid rgba(201, 169, 110, 0.3);
+    padding: 8px 20px;
+    border-radius: 40px;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.ctaBtn:hover {
+    background: var(--gold);
+    color: var(--ink);
+    border-color: var(--gold);
+    box-shadow: 0 0 24px rgba(201, 169, 110, 0.25);
+}
+
+@media (max-width: 640px) {
+    .nav {
+        padding: 16px 20px;
+    }
+
+    .nav.scrolled {
+        padding: 12px 20px;
+    }
+
+    .ctaBtn {
+        display: none;
+    }
+
+    .brandSub {
+        display: none;
+    }
 }

@@ -1,23 +1,49 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --primary: #3b6b58;
-  --primary-light: #528a74;
-  --primary-dim: rgba(59, 107, 88, 0.15);
-  --bg: #eae3d9;
-  --bg-card: #f5f0eb;
-  --text: #1a2f26;
-  --muted: #5a7368;
-  --muted-light: rgba(90, 115, 104, 0.5);
-  --white: #ffffff;
-  --border: rgba(59, 107, 88, 0.12);
-  --radius: 28px;
-  --radius-sm: 16px;
-  --shadow: 0 8px 40px rgba(26, 47, 38, 0.08);
-  --shadow-lg: 0 20px 60px rgba(26, 47, 38, 0.12);
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* ── Color Palette ── */
+  --ink: #0d1511;
+  /* near-black background */
+  --ink-2: #111a16;
+  /* card background */
+  --ink-3: #18251e;
+  /* raised surface */
+  --ink-4: #1e2e25;
+  /* elevated card */
+  --gold: #c9a96e;
+  /* warm gold accent */
+  --gold-light: #e2c99a;
+  --gold-dim: rgba(201, 169, 110, 0.12);
+  --gold-glow: rgba(201, 169, 110, 0.25);
+  --sage: #3d7a5f;
+  /* muted green */
+  --sage-dim: rgba(61, 122, 95, 0.15);
+  --text: #f0ebe3;
+  /* warm off-white */
+  --text-2: #b8b0a4;
+  /* secondary text */
+  --text-3: #7a736b;
+  /* muted text */
+  --border: rgba(201, 169, 110, 0.1);
+  --border-2: rgba(240, 235, 227, 0.06);
+
+  /* ── Spacing & Shape ── */
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+
+  /* ── Shadows ── */
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.5);
+  --glow-gold: 0 0 40px rgba(201, 169, 110, 0.2);
+
+  /* ── Motion ── */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --transition: all 0.35s var(--ease);
 }
 
+/* ── Reset ── */
 *,
 *::before,
 *::after {
@@ -29,11 +55,12 @@
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   font-family: 'Inter', sans-serif;
-  background: var(--bg);
+  background: var(--ink);
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
@@ -54,26 +81,36 @@ button {
   cursor: pointer;
 }
 
-/* ── SCROLLBAR ── */
+/* ── Scrollbar ── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: var(--ink);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: var(--primary-dim);
+  background: var(--gold-dim);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: var(--gold);
 }
 
-/* ── UTILITY ── */
-.serif {
-  font-family: 'Playfair Display', serif;
+/* ── Typography utilities ── */
+.display {
+  font-family: 'Cormorant Garamond', serif;
 }
 
+/* ── Selection ── */
+::selection {
+  background: var(--gold-glow);
+  color: var(--gold-light);
+}
+
+/* ── Visually hidden ── */
 .visually-hidden {
   position: absolute;
   width: 1px;
