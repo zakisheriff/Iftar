@@ -1,0 +1,133 @@
+.card {
+    display: block;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    animation: fadeUp 0.6s ease both;
+    text-decoration: none;
+    color: inherit;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+}
+
+.imageWrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #1a2f26;
+}
+
+.image {
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover .image {
+    transform: scale(1.06);
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, rgba(26, 47, 38, 0.7) 100%);
+}
+
+.yearBadge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: var(--accent, var(--primary));
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 30px;
+    letter-spacing: 0.5px;
+    z-index: 2;
+}
+
+.body {
+    padding: 24px;
+    position: relative;
+}
+
+.theme {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent, var(--primary));
+    margin-bottom: 8px;
+}
+
+.title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.25;
+    margin-bottom: 10px;
+}
+
+.quote {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.metaItem svg {
+    color: var(--accent, var(--primary));
+    flex-shrink: 0;
+}
+
+.arrow {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    color: var(--accent, var(--primary));
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: var(--transition);
+}
+
+.card:hover .arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
