@@ -87,6 +87,17 @@ export default function Gallery({ year, staticImages }) {
         return () => window.removeEventListener('keydown', handler);
     }, [lightboxIndex, prev, next]);
 
+    // Preload adjacent images so navigation feels instant
+    useEffect(() => {
+        if (lightboxIndex === null || photos.length === 0) return;
+        const preload = (idx) => {
+            const img = new window.Image();
+            img.src = photos[idx].full;
+        };
+        preload((lightboxIndex + 1) % photos.length);
+        preload((lightboxIndex - 1 + photos.length) % photos.length);
+    }, [lightboxIndex, photos]);
+
     if (loading) {
         return (
             <div className={styles.loadingState}>
@@ -140,6 +151,7 @@ export default function Gallery({ year, staticImages }) {
                             alt={photo.name}
                             className={styles.thumbImg}
                             loading="lazy"
+                            onError={(e) => { e.target.style.opacity = '0'; }}
                         />
                         <div className={styles.thumbOverlay}>
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -168,34 +180,77 @@ export default function Gallery({ year, staticImages }) {
                 </div>
             )}
 
-            {/* Lightbox */}
+            {/* ── Lightbox ── */}
             {lightboxIndex !== null && (
                 <div className={styles.lightbox} onClick={closeLightbox}>
-                    <button className={styles.closeBtn} onClick={closeLightbox} aria-label="Close">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                        </svg>
-                    </button>
-                    <button className={`${styles.navBtn} ${styles.navLeft}`} onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M15 18l-6-6 6-6" />
-                        </svg>
-                    </button>
-                    <div className={styles.lightboxImg} onClick={(e) => e.stopPropagation()}>
-                        {/* Full-res image for lightbox */}
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                            src={photos[lightboxIndex].full}
-                            alt={photos[lightboxIndex].name}
-                            className={styles.lbImage}
-                        />
+
+                    {/* TOP BAR: filename + download + close */}
+                    <div className={styles.lbTop} onClick={(e) => e.stopPropagation()}>
+                        <span className={styles.lbFileName}>{photos[lightboxIndex].name}</span>
+                        <div className={styles.lbTopRight}>
+                            <a
+                                href={photos[lightboxIndex].download || photos[lightboxIndex].full}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={styles.downloadBtn}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                                Download
+                            </a>
+                            <button className={styles.closeBtn} onClick={closeLightbox} aria-label="Close">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
-                    <button className={`${styles.navBtn} ${styles.navRight}`} onClick={(e) => { e.stopPropagation(); next(); }} aria-label="Next">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M9 18l6-6-6-6" />
-                        </svg>
-                    </button>
-                    <div className={styles.counter}>{lightboxIndex + 1} / {photos.length}</div>
+
+                    {/* MIDDLE: prev arrow + image + next arrow */}
+                    <div className={styles.lbCenter} onClick={(e) => e.stopPropagation()}>
+                        <button className={styles.lbArrow} onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M15 18l-6-6 6-6" />
+                            </svg>
+                        </button>
+
+                        <div className={styles.lbImgWrap}>
+                            {/* Blurred thumbnail — shows immediately since it's already cached */}
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                                key={`blur-${photos[lightboxIndex].id}`}
+                                src={photos[lightboxIndex].thumb}
+                                alt=""
+                                aria-hidden="true"
+                                className={styles.lbBlur}
+                            />
+                            {/* Full image — fades in on load */}
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                                key={photos[lightboxIndex].id}
+                                src={photos[lightboxIndex].full}
+                                alt={photos[lightboxIndex].name}
+                                className={styles.lbImage}
+                                onLoad={(e) => e.target.classList.add(styles.lbImageLoaded)}
+                            />
+                        </div>
+
+                        <button className={styles.lbArrow} onClick={(e) => { e.stopPropagation(); next(); }} aria-label="Next">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M9 18l6-6-6-6" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {/* BOTTOM: counter */}
+                    <div className={styles.lbBottom}>
+                        {lightboxIndex + 1} / {photos.length}
+                    </div>
+
                 </div>
             )}
         </>

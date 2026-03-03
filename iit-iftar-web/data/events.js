@@ -45,7 +45,7 @@ const events = [
     galleryImages: [
       "/images/2023-cover.png",
       "/images/2022-cover.png",
-      "/images/2025-cover.png",
+      "/images/2025-cover.jpeg",
     ],
   },
   {
@@ -70,7 +70,7 @@ const events = [
     galleryImages: [
       "/images/2024-cover.png",
       "/images/2022-cover.png",
-      "/images/2026-cover.png",
+      "/images/2026-cover.jpg",
     ],
   },
   {
@@ -91,9 +91,9 @@ const events = [
       "A special panel discussion titled 'Ramadan & Purpose' brought together graduates in medicine, tech, and arts.",
       "The evening was documented with a professional photography and videography team for the first time.",
     ],
-    coverImage: "/images/2025-cover.png",
+    coverImage: "/images/2025-cover.jpeg",
     galleryImages: [
-      "/images/2025-cover.png",
+      "/images/2025-cover.jpeg",
       "/images/2023-cover.png",
       "/images/2024-cover.png",
     ],
@@ -117,10 +117,10 @@ const events = [
       "The IIT Iftar QR attendance system was introduced for the first time, making check-in seamless and data-driven.",
       "A short film capturing the full journey from 2022 to 2026 was premiered to a standing ovation.",
     ],
-    coverImage: "/images/2026-cover.png",
+    coverImage: "/images/2026-cover.jpg",
     galleryImages: [
-      "/images/2026-cover.png",
-      "/images/2025-cover.png",
+      "/images/2026-cover.jpg",
+      "/images/2025-cover.jpeg",
       "/images/2022-cover.png",
     ],
   },

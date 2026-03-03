@@ -28,7 +28,7 @@ export default function EventPage({ event, prev, next }) {
     return (
         <>
             <Head>
-                <title>{event.title} — IIT Iftar</title>
+                <title>{`${event.title} — IIT Iftar`}</title>
                 <meta name="description" content={`${event.theme} · ${event.date} · ${event.attendees} guests`} />
                 <link rel="icon" href="/iftar-logo.png" />
             </Head>

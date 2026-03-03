@@ -52,10 +52,11 @@ export default async function handler(req, res) {
         // Build clean photo objects for the frontend
         const photos = (data.files || []).map((file) => ({
             id: file.id,
-            // Thumbnail for the grid (Drive serves this directly, fast)
-            thumb: `https://drive.google.com/thumbnail?id=${file.id}&sz=w600`,
-            // Full resolution URL for lightbox
-            full: `https://drive.google.com/uc?export=view&id=${file.id}`,
+            // Proxied through our own server — no CORS, no cookie, no browser restrictions
+            thumb: `/api/img/${file.id}?sz=w600`,
+            full: `/api/img/${file.id}?sz=w1200`,
+            // Download still goes direct to Drive (triggers browser save dialog)
+            download: `https://drive.google.com/uc?export=download&id=${file.id}`,
             name: file.name,
         }));
 
