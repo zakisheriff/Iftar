@@ -677,8 +677,12 @@
     padding: 0 20px;
   }
 
+  .timeline::before {
+    left: 119px;
+  }
+
   .timelineItem {
-    grid-template-columns: min-content 30px 1fr;
+    grid-template-columns: 80px 30px 1fr;
     padding: 24px 0;
     gap: 0;
   }
