@@ -596,19 +596,21 @@
         .mark-btn {
             background: var(--primary-dim);
             color: var(--primary);
-            border: 1px solid var(--primary-dim);
-            padding: 6px 12px;
+            border: 1px solid rgba(59, 107, 88, 0.25);
+            padding: 7px 14px;
             border-radius: 12px;
             font-size: 11px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
+            font-family: inherit;
         }
 
         .mark-btn:hover {
             background: var(--primary);
             color: #fff;
+            transform: translateY(-1px);
         }
 
         .list-empty {
@@ -902,6 +904,8 @@
                     </div>
                     <div class="result-label" id="result-label"></div>
                     <div class="result-name" id="result-name"></div>
+                    <div class="result-name" id="result-iit-id" style="font-size:13px;opacity:0.75;margin-top:2px;">
+                    </div>
                 </div>
             </div>
 
@@ -1109,27 +1113,27 @@
         // ================================================================
         //  TOKEN VALIDATION
         // ================================================================
-        function validateToken(token) {
+        function validateToken(iitId) {
             // Show loading spinner over the scanner immediately
             loadingOverlay.classList.add("show");
 
-            fetch(APPS_SCRIPT_URL + "?token=" + encodeURIComponent(token))
+            fetch(APPS_SCRIPT_URL + "?iit_id=" + encodeURIComponent(iitId))
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     loadingOverlay.classList.remove("show");
 
                     if (data.status === "success") {
-                        showResult("success", "success", "Admitted! Welcome.", data.name);
-                        addLog("success", data.name || "Student", "Admitted");
+                        showResult("success", "success", "Admitted! Welcome.", data.name, data.iit_id);
+                        addLog("success", data.name || "Student", data.iit_id || "", "Admitted");
                         stats.total++; stats.ok++;
                         fetchMasterList(); // Refresh list to show them as admitted
                     } else if (data.status === "already_used") {
-                        showResult("used", "used", "Already Checked In", data.name);
-                        addLog("used", data.name || "Unknown", "Duplicate scan");
+                        showResult("used", "used", "Already Checked In", data.name, data.iit_id);
+                        addLog("used", data.name || "Unknown", data.iit_id || "", "Duplicate scan");
                         stats.total++; stats.dup++;
                     } else {
-                        showResult("invalid", "invalid", "Invalid QR Code", "Token not recognised");
-                        addLog("invalid", "Unknown", "Invalid QR");
+                        showResult("invalid", "invalid", "Invalid QR Code", "Token not recognised", "");
+                        addLog("invalid", "Unknown", "", "Invalid QR");
                         stats.total++; stats.dup++;
                     }
                     updateStats();
@@ -1148,8 +1152,9 @@
         var resultIcon = document.getElementById("result-icon-svg");
         var resultLabel = document.getElementById("result-label");
         var resultName = document.getElementById("result-name");
+        var resultIitId = document.getElementById("result-iit-id");
 
-        function showResult(type, iconType, label, name) {
+        function showResult(type, iconType, label, name, iitId) {
             overlay.className = "show " + type;
 
             // Set SVG dynamically
@@ -1163,6 +1168,7 @@
 
             resultLabel.textContent = label;
             resultName.textContent = name || "";
+            resultIitId.textContent = iitId ? "IIT ID: " + iitId : "";
 
             setTimeout(function () {
                 overlay.className = "";
@@ -1180,7 +1186,7 @@
             document.getElementById("stat-dup").textContent = pending;
         }
 
-        function addLog(badgeType, name, outcome) {
+        function addLog(badgeType, name, iitId, outcome) {
             var now = new Date();
             var timeStr = now.getHours().toString().padStart(2, "0") + ":" +
                 now.getMinutes().toString().padStart(2, "0") + ":" +
@@ -1206,7 +1212,7 @@
                 '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' + svgContent + '</svg>' +
                 '</div>' +
                 '<div class="log-info">' +
-                '<div class="log-name">' + escapeHtml(name) + '</div>' +
+                '<div class="log-name">' + escapeHtml(name) + (iitId ? ' <span style="font-weight:400;color:var(--muted);font-size:12px;">· ' + escapeHtml(iitId) + '</span>' : '') + '</div>' +
                 '<div class="log-time">' + outcome + ' &middot; ' + timeStr + '</div>' +
                 '</div>';
 
@@ -1266,7 +1272,8 @@
             var filtered = (masterStudentList || []).filter(function (s) {
                 var name = (s.name || "").toLowerCase();
                 var email = (s.email || "").toLowerCase();
-                var matchesSearch = name.indexOf(searchVal) !== -1 || email.indexOf(searchVal) !== -1;
+                var iitId = (s.iit_id || "").toLowerCase();
+                var matchesSearch = name.indexOf(searchVal) !== -1 || email.indexOf(searchVal) !== -1 || iitId.indexOf(searchVal) !== -1;
 
                 var matchesFilter = true;
                 if (currentFilter === 'success') matchesFilter = (s.attended === true);
@@ -1288,12 +1295,19 @@
             listEl.innerHTML = filtered.map(function (s) {
                 var statusText = s.attended ? 'Admitted' : 'Pending';
 
+                var markBtn = s.attended ? '' :
+                    '<button class="mark-btn" onclick="manualMark(' +
+                    JSON.stringify(s.iit_id || '') + ',' +
+                    JSON.stringify(s.name || '') +
+                    ')">Mark Attended</button>';
+
                 return '<div class="student-item">' +
                     '<div class="student-status-dot ' + (s.attended ? 'status-admitted' : 'status-pending') + '"></div>' +
                     '<div class="student-info">' +
-                    '<div class="student-name">' + escapeHtml(s.name) + '</div>' +
-                    '<div class="student-email">' + statusText + ' &middot; ' + escapeHtml(s.email) + '</div>' +
+                    '<div class="student-name">' + escapeHtml(s.name) + (s.iit_id ? ' <span style="font-weight:400;font-size:12px;color:var(--muted);">· ' + escapeHtml(s.iit_id) + '</span>' : '') + '</div>' +
+                    '<div class="student-email">' + statusText + ' · ' + escapeHtml(s.email) + '</div>' +
                     '</div>' +
+                    markBtn +
                     '</div>';
             }).join('');
         }
@@ -1302,6 +1316,44 @@
 
         function onSearchInput() {
             renderStudentList();
+        }
+
+        // ================================================================
+        //  MANUAL MARK (fallback when QR unavailable)
+        // ================================================================
+        function manualMark(iitId, name) {
+            if (!iitId) {
+                alert('No IIT ID found for this student. Cannot mark manually.');
+                return;
+            }
+            var confirmed = confirm(
+                'MANUAL OVERRIDE\n\n' +
+                'Student: ' + name + '\n' +
+                'IIT ID:  ' + iitId + '\n\n' +
+                'Are you sure this student is physically present and attended?'
+            );
+            if (!confirmed) return;
+
+            var separator = APPS_SCRIPT_URL.indexOf('?') !== -1 ? '&' : '?';
+            var url = APPS_SCRIPT_URL + separator + 'action=manualMark&iit_id=' + encodeURIComponent(iitId);
+
+            fetch(url)
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (data.status === 'success') {
+                        showResult('success', 'success', 'Manually Admitted', data.name, data.iit_id);
+                        addLog('success', data.name || name, data.iit_id || iitId, 'Manual override');
+                        fetchMasterList();
+                    } else if (data.status === 'already_used') {
+                        showResult('used', 'used', 'Already Checked In', data.name, data.iit_id);
+                        addLog('used', data.name || name, data.iit_id || iitId, 'Already admitted');
+                    } else {
+                        alert('Error: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(function () {
+                    alert('Network error. Check your internet connection.');
+                });
         }
 
         function filterList(type, element) {
