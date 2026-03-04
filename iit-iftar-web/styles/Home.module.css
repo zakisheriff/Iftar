@@ -682,19 +682,32 @@
   }
 
   .timelineItem {
-    grid-template-columns: calc(50% - 20px) 40px calc(50% - 20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 24px 0;
     gap: 0;
   }
 
   .timelineYear {
+    width: calc(50% - 20px);
+    flex-shrink: 0;
     font-size: 32px;
     padding-right: 12px;
     text-align: right;
   }
 
+  .timelineDot {
+    width: 40px;
+    flex-shrink: 0;
+  }
+
   .timelineContent {
+    width: calc(50% - 20px);
+    flex-shrink: 0;
     padding-left: 12px;
+    word-break: break-word;
+    min-width: 0;
   }
 
   .timelineTitle {
