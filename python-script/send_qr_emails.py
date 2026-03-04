@@ -133,25 +133,19 @@ def build_email(to_email: str, name: str, iit_id: str,
     chips_block = f'<div class="chips">{chips}</div>' if chips else ""
 
     html = f"""<!DOCTYPE html>
-<html lang="en" style="color-scheme:light !important;">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" style="color-scheme:dark !important;">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="light">
-<meta name="supported-color-schemes" content="light">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
 <style>
-  :root {{ color-scheme: light !important; }}
+  :root {{ color-scheme: dark !important; }}
   @media (prefers-color-scheme: dark) {{
-    body {{ background:#0b1512 !important; color:#f0e6c8 !important; }}
-    .email-outer {{ background:#0b1512 !important; }}
-    .wrapper {{ background:#0f1e17 !important; }}
-    .header {{ background:#0a1a10 !important; }}
-    .body {{ background:#0f1e17 !important; }}
-    .footer {{ background:#0a1410 !important; }}
-    .event-box {{ background:rgba(255,255,255,0.03) !important; }}
-    .warn-box {{ background:rgba(197,163,88,0.05) !important; }}
-    .iitid-tag {{ background:rgba(197,163,88,0.1) !important; }}
-    .chip {{ background:rgba(197,163,88,0.08) !important; }}
+    body,table,td {{ background-color:#0b1512 !important; color:#f0e6c8 !important; }}
+  }}
+  @media (prefers-color-scheme: light) {{
+    body,table,td {{ background-color:#0b1512 !important; color:#f0e6c8 !important; }}
   }}
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
   body {{
@@ -439,8 +433,12 @@ def build_email(to_email: str, name: str, iit_id: str,
 </style>
 </head>
 <body style="margin:0;padding:0;background-color:#0b1512 !important;font-family:'Inter',Arial,sans-serif;">
-<div style="background-color:#0b1512 !important;padding:32px 16px;">
-<div style="max-width:560px;margin:0 auto;background-color:#0f1e17 !important;border-radius:28px;overflow:hidden;border:1px solid rgba(197,163,88,0.25);box-shadow:0 24px 80px rgba(0,0,0,0.6);">
+<!-- Outer bgcolor table — Gmail cannot strip HTML attributes -->
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#0b1512" style="background-color:#0b1512 !important;">
+<tr><td align="center" bgcolor="#0b1512" style="background-color:#0b1512 !important;padding:32px 16px;">
+<!-- Inner wrapper -->
+<table width="560" border="0" cellpadding="0" cellspacing="0" style="max-width:560px;background-color:#0f1e17 !important;border-radius:28px;overflow:hidden;border:1px solid rgba(197,163,88,0.25);box-shadow:0 24px 80px rgba(0,0,0,0.6);">
+<tr><td bgcolor="#0f1e17" style="background-color:#0f1e17 !important;border-radius:28px;">
 
   <!-- HEADER -->
   <div style="background-color:#0a1a10 !important;padding:36px 24px 28px;text-align:center;border-bottom:1px solid rgba(197,163,88,0.2);">
@@ -504,8 +502,10 @@ def build_email(to_email: str, name: str, iit_id: str,
     IIT IFTAR COMMITTEE &nbsp;&#183;&nbsp; This is an automated message &mdash; please do not reply
   </div>
 
-</div>
-</div>
+</td></tr>
+</table>
+</td></tr>
+</table>
 </body></html>"""
 
     msg = MIMEMultipart("related")

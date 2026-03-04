@@ -658,15 +658,15 @@
         }
 
         .confirm-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--primary);
+            font-size: 17px;
+            font-weight: 700;
+            color: #f0f0f0;
             margin-bottom: 3px;
         }
 
         .confirm-iitid {
             font-size: 12px;
-            color: var(--muted);
+            color: rgba(240, 240, 240, 0.5);
             margin-bottom: 20px;
         }
 
@@ -1154,6 +1154,11 @@
                 document.getElementById("reset-setup-btn").style.display = 'block';
                 startCamera();
                 fetchMasterList();
+                // Auto-refresh every 30s so manual Sheet changes update here
+                if (window._autoRefresh) clearInterval(window._autoRefresh);
+                window._autoRefresh = setInterval(function () {
+                    if (APPS_SCRIPT_URL) fetchMasterList();
+                }, 30000);
             } else {
                 setupBanner.style.display = 'block';
                 cameraCard.style.display = 'none';
