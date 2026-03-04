@@ -499,3 +499,42 @@
     font-weight: 600;
     color: rgba(255, 255, 255, 0.4);
 }
+
+/* ── MOBILE RESPONSIVENESS ── */
+@media (max-width: 768px) {
+    .lbCenter {
+        position: relative;
+    }
+
+    .lbArrow {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 60px;
+        z-index: 10;
+        background: transparent;
+        /* or a subtle linear gradient to separate from image */
+    }
+
+    /* Assume the first arrow is prev and second is next */
+    .lbArrow:has(svg) {
+        position: absolute;
+    }
+
+    .lbArrow:nth-of-type(1) {
+        left: 0;
+        /* slightly gradient to show arrow on light images */
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.4), transparent);
+    }
+
+    .lbArrow:nth-of-type(2) {
+        right: 0;
+        background: linear-gradient(to left, rgba(0, 0, 0, 0.4), transparent);
+    }
+
+    .lbImgWrap {
+        padding: 0;
+        width: 100%;
+        margin: 0;
+    }
+}

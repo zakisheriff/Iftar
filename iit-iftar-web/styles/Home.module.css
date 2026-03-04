@@ -5,11 +5,13 @@
 .main {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* ── HERO ─────────────────────────────────── */
 .hero {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -584,12 +586,19 @@
 
 .footerBrand {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--text-2);
-  margin-bottom: 4px;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.footerBrand span {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: var(--gold);
 }
 
 .footerText {
@@ -619,6 +628,19 @@
 
 /* ── MOBILE RESPONSIVENESS ── */
 @media (max-width: 768px) {
+  .hero {
+    padding: 100px 20px 80px;
+  }
+
+  .heroTitle {
+    font-size: clamp(38px, 12vw, 52px);
+  }
+
+  .heroSub {
+    font-size: 14px;
+    margin: 16px auto 32px;
+  }
+
   .heroStats {
     width: auto;
     flex-wrap: nowrap;
@@ -653,5 +675,35 @@
     width: 100%;
     max-width: none;
     padding: 0 20px;
+  }
+
+  .timelineItem {
+    grid-template-columns: min-content 30px 1fr;
+    padding: 24px 0;
+    gap: 0;
+  }
+
+  .timelineYear {
+    font-size: 32px;
+    padding-right: 12px;
+    text-align: right;
+  }
+
+  .timelineContent {
+    padding-left: 12px;
+  }
+
+  .timelineTitle {
+    font-size: 16px;
+  }
+
+  .timelineTheme {
+    font-size: 9px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .timelineGuests {
+    font-size: 11px;
   }
 }

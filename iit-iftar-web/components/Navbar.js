@@ -25,9 +25,6 @@ export default function Navbar() {
                     <Link href="/" className={styles.link}>Home</Link>
                     <Link href="/#events" className={styles.link}>Events</Link>
                     <Link href="/#about" className={styles.link}>About</Link>
-                    <Link href="/#events" className={styles.ctaBtn}>
-                        Explore
-                    </Link>
                 </div>
             </div>
         </nav>

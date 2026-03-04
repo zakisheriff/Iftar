@@ -41,7 +41,7 @@ export default function Home() {
                         </h1>
                         <p className={styles.heroSub}>
                             Four years. Four themes. One unbroken thread of community.
-                            Relive every evening we gathered to break bread, share stories, and build something that lasts.
+                            Relive the evenings we gathered, shared stories, and built something that lasts.
                         </p>
                         <div className={styles.heroActions}>
                             <div className={styles.heroStats}>
@@ -66,18 +66,15 @@ export default function Home() {
                         </div>
                     </div>
 
-                    <div className={styles.scrollIndicator}>
-                        <div className={styles.scrollLine} />
-                        <span>Scroll</span>
-                    </div>
+
                 </section>
 
                 {/* ── EVENTS GRID ── */}
                 <section className={styles.eventsSection} id="events">
                     <div className={styles.container}>
                         <div className={styles.sectionHeader}>
-                            <p className={styles.sectionEyebrow}>The Archive</p>
-                            <h2 className={styles.sectionTitle}>Every Iftar, Remembered</h2>
+                            <p className={styles.sectionEyebrow}>The Memories</p>
+                            <h2 className={styles.sectionTitle}>Every Iftar, Remembered.</h2>
                             <p className={styles.sectionDesc}>
                                 From the first tentative gathering to a grand annual tradition — each year has its own story to tell.
                             </p>
@@ -121,7 +118,7 @@ export default function Home() {
                         <p className={styles.quoteText}>
                             "The best of people are those who are most beneficial to others."
                         </p>
-                        <p className={styles.quoteAuthor}>— Hadith</p>
+                        <p className={styles.quoteAuthor}>— Al-Muʿjam al-Awsat (al-Tabarani), Hadith 6192.</p>
                     </div>
                 </section>
 
@@ -159,7 +156,7 @@ export default function Home() {
                     <div className={styles.container}>
                         <div className={styles.footerInner}>
                             <div className={styles.footerBrand}>
-                                <Image src="/iftar-logo.png" alt="IIT Iftar" width={24} height={24} />
+                                <Image src="/iftar-logo.png" alt="IIT Iftar" width={48} height={48} />
                                 <span>IIT Iftar Committee</span>
                             </div>
                             <div className={styles.footerGold} />
