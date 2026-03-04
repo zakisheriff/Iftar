@@ -371,17 +371,6 @@
   gap: 0;
   padding: 32px 0;
   border-bottom: 1px solid rgba(201, 169, 110, 0.06);
-  opacity: 0;
-  transform: translateY(32px);
-  filter: blur(4px);
-  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease), filter 0.4s var(--ease);
-}
-
-.timelineItem.visible {
-  animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  opacity: 1;
-  filter: blur(0);
-  transform: translateY(0);
 }
 
 .timelineItem:last-child {

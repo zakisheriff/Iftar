@@ -161,31 +161,12 @@ export default function Home() {
     );
 }
 
-function TimelineItem({ event, index }) {
-    const [isVisible, setIsVisible] = useState(false);
-    const ref = useRef(null);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(([entry]) => {
-            if (entry.isIntersecting) {
-                setIsVisible(true);
-                observer.unobserve(entry.target);
-            }
-        }, { threshold: 0.15 });
-
-        if (ref.current) observer.observe(ref.current);
-        return () => observer.disconnect();
-    }, []);
-
+function TimelineItem({ event }) {
     return (
         <Link
-            ref={ref}
             href={`/events/${event.slug}`}
-            className={`${styles.timelineItem} ${isVisible ? styles.visible : ''}`}
-            style={{
-                textDecoration: 'none',
-                animationDelay: `${(index % 2) * 0.15}s`
-            }}
+            className={styles.timelineItem}
+            style={{ textDecoration: 'none' }}
         >
             <div className={styles.timelineYear}>{event.year}</div>
             <div className={styles.timelineDot}>

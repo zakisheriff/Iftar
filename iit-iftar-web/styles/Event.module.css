@@ -449,6 +449,13 @@
         font-size: 40px;
     }
 
+    .heroQuote {
+        font-size: 16px;
+        line-height: 1.5;
+        margin-bottom: 32px;
+        padding-left: 20px;
+    }
+
     .navRow {
         grid-template-columns: 1fr;
         gap: 24px;
