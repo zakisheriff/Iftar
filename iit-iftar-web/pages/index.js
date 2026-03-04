@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import Navbar from '../components/Navbar';
 import EventCard from '../components/EventCard';
 import events from '../data/events';
@@ -95,18 +96,8 @@ export default function Home() {
                             <h2 className={styles.sectionTitle}>Four Years at a Glance</h2>
                         </div>
                         <div className={styles.timelineList}>
-                            {events.map((event) => (
-                                <Link href={`/events/${event.slug}`} key={event.year} className={styles.timelineItem} style={{ textDecoration: 'none' }}>
-                                    <div className={styles.timelineYear}>{event.year}</div>
-                                    <div className={styles.timelineDot}>
-                                        <div className={styles.timelineDotInner} />
-                                    </div>
-                                    <div className={styles.timelineContent}>
-                                        <div className={styles.timelineTheme}>{event.theme}</div>
-                                        <div className={styles.timelineTitle}>{event.title}</div>
-                                        <div className={styles.timelineGuests}>{event.attendees.toLocaleString()} guests · {event.venue.split(',')[0]}</div>
-                                    </div>
-                                </Link>
+                            {events.map((event, i) => (
+                                <TimelineItem key={event.year} event={event} index={i} />
                             ))}
                         </div>
                     </div>
@@ -167,5 +158,44 @@ export default function Home() {
                 </footer>
             </main>
         </>
+    );
+}
+
+function TimelineItem({ event, index }) {
+    const [isVisible, setIsVisible] = useState(false);
+    const ref = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) {
+                setIsVisible(true);
+                observer.unobserve(entry.target);
+            }
+        }, { threshold: 0.15 });
+
+        if (ref.current) observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <Link
+            ref={ref}
+            href={`/events/${event.slug}`}
+            className={`${styles.timelineItem} ${isVisible ? styles.visible : ''}`}
+            style={{
+                textDecoration: 'none',
+                animationDelay: `${(index % 2) * 0.15}s`
+            }}
+        >
+            <div className={styles.timelineYear}>{event.year}</div>
+            <div className={styles.timelineDot}>
+                <div className={styles.timelineDotInner} />
+            </div>
+            <div className={styles.timelineContent}>
+                <div className={styles.timelineTheme}>{event.theme}</div>
+                <div className={styles.timelineTitle}>{event.title}</div>
+                <div className={styles.timelineGuests}>{event.attendees.toLocaleString()} guests · {event.venue.split(',')[0]}</div>
+            </div>
+        </Link>
     );
 }

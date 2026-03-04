@@ -11,9 +11,14 @@
     background: var(--ink-2);
     border: 1px solid rgba(240, 235, 227, 0.06);
     cursor: pointer;
-    text-decoration: none;
-    animation: cardIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+    filter: blur(4px);
     transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease), border-color 0.45s var(--ease);
+}
+
+.visible {
+    animation: cardIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @keyframes cardIn {

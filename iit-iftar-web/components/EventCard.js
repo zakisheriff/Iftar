@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import styles from './EventCard.module.css';
 
 export default function EventCard({ event, index }) {
@@ -8,15 +9,33 @@ export default function EventCard({ event, index }) {
     // Row 2: span 1, span 2
     // Row 3: span 2, span 1 ...
     const isFeatured = index % 4 === 0 || index % 4 === 3;
+    const [isVisible, setIsVisible] = useState(false);
+    const ref = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.unobserve(entry.target);
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (ref.current) observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, []);
 
     return (
         <Link
+            ref={ref}
             href={`/events/${event.slug}`}
-            className={`${styles.card} ${isFeatured ? styles.featured : ''}`}
+            className={`${styles.card} ${isFeatured ? styles.featured : ''} ${isVisible ? styles.visible : ''}`}
             style={{
                 '--accent': event.accentColor,
                 '--accent-light': event.accentLight,
-                animationDelay: `${index * 0.08}s`,
+                animationDelay: `${(index % 2) * 0.15}s`,
             }}
         >
             {/* Cover image */}
