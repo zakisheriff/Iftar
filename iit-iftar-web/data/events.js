@@ -11,15 +11,15 @@ const events = [
         accentColor: "#9e5a3c",
         accentLight: "rgba(158,90,60,0.12)",
         highlights: [
-            "The inaugural IIT Iftar — welcoming 210 guests including students, faculty, and community members.",
+            "The inaugural IIT Iftar — welcoming 900+ guests including students, faculty, and community members.",
             "The Grand Hall was transformed with hundreds of hand-painted paper lanterns crafted by volunteers.",
             "A live Nasheeds performance opened the evening, followed by a photographic exhibition tracing the history of Iftar across cultures.",
             "A surprise appearance from an alumnus who flew in from abroad just for the event became the talk of the evening.",
             "Over 18 dishes from across the Muslim world were served — a true culinary journey.",
         ],
-        coverImage: "/images/2023-cover.jpg",
+        coverImage: "/images/2023.png",
         galleryImages: [
-            "/images/2023-cover.jpg",
+            "/images/2023.jpg",
             "/images/2024-cover.jpg",
             "/images/2025-cover.jpeg",
         ],
@@ -37,7 +37,7 @@ const events = [
         accentLight: "rgba(122,108,46,0.12)",
         highlights: [
             "For the first time, the event moved outdoors — the Block C courtyard was lit with 500+ fairy lights and Moroccan lanterns.",
-            "310 attendees made it the largest IIT Iftar yet, with a 6-week registration queue and a waitlist of over 60.",
+            "1000+ attendees made it the largest IIT Iftar yet, with a 6-week registration queue and a waitlist of over 60.",
             "A community spotlight segment featured 5 students sharing personal stories about what Ramadan means to them.",
             "Live oud music filled the courtyard as the sun set, creating a moment that attendees still talk about.",
             "A charity corner raised over LKR 85,000 for local families, collected entirely on the evening.",
@@ -45,7 +45,7 @@ const events = [
         coverImage: "/images/2024-cover.jpg",
         galleryImages: [
             "/images/2024-cover.jpg",
-            "/images/2023-cover.jpg",
+            "/images/2023.png",
             "/images/2025-cover.jpeg",
         ],
     },
@@ -62,7 +62,7 @@ const events = [
         accentLight: "rgba(46,92,138,0.12)",
         highlights: [
             "The most ambitious production yet — Islamic geometric patterns were digitally projected across all four walls.",
-            "420 attendees, including faculty families and distinguished guests from across Colombo's student community.",
+            "1200+ attendees, including faculty families and distinguished guests from across Colombo's student community.",
             "A 'Message Wall' let every guest write what they were grateful for — over 400 notes were later compiled into a keepsake booklet.",
             "A special panel discussion titled 'Ramadan & Purpose' brought together graduates in medicine, tech, and arts.",
             "The evening was documented with a professional photography and videography team for the first time.",
@@ -70,7 +70,7 @@ const events = [
         coverImage: "/images/2025-cover.jpeg",
         galleryImages: [
             "/images/2025-cover.jpeg",
-            "/images/2023-cover.jpg",
+            "/images/2023.png",
             "/images/2024-cover.jpg",
         ],
     },

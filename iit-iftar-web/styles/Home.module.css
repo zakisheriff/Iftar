@@ -681,31 +681,33 @@
     left: 50%;
   }
 
+  .timeline::before {
+    left: calc(42% + 3.84px);
+  }
+
   .timelineItem {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, calc(42% - 12px)) 24px minmax(0, calc(58% - 12px));
     align-items: center;
-    justify-content: center;
     padding: 24px 0;
     gap: 0;
   }
 
   .timelineYear {
-    width: calc(50% - 20px);
-    flex-shrink: 0;
-    font-size: 32px;
-    padding-right: 12px;
+    font-size: 26px;
+    padding-right: 24px;
     text-align: right;
   }
 
   .timelineDot {
-    width: 40px;
-    flex-shrink: 0;
+    width: 24px;
+    display: flex;
+    justify-content: center;
   }
 
   .timelineContent {
-    width: calc(50% - 20px);
-    flex-shrink: 0;
-    padding-left: 12px;
+    padding-left: 20px;
+    padding-right: 12px;
     word-break: break-word;
     min-width: 0;
   }
