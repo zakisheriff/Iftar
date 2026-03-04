@@ -736,15 +736,30 @@
 
   .timelineTitle {
     font-size: 16px;
-  }
 
-  .timelineTheme {
-    font-size: 9px;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-  }
 
-  .timelineGuests {
-    font-size: 11px;
+
+    .timelineTheme {
+      font-size: 9px;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .timelineGuests {
+      font-size: 11px;
+    }
   }
+}
+
+.fadeInBox {
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(4px);
+  transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.fadeInBox.visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
 }

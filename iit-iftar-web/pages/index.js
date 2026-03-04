@@ -73,13 +73,13 @@ export default function Home() {
                 {/* ── EVENTS GRID ── */}
                 <section className={styles.eventsSection} id="events">
                     <div className={styles.container}>
-                        <div className={styles.sectionHeader}>
+                        <FadeInBox className={styles.sectionHeader}>
                             <p className={styles.sectionEyebrow}>The Memories</p>
                             <h2 className={styles.sectionTitle}>Every Iftar, Remembered.</h2>
                             <p className={styles.sectionDesc}>
                                 From the first tentative gathering to a grand annual tradition — each year has its own story to tell.
                             </p>
-                        </div>
+                        </FadeInBox>
                         <div className={styles.eventsGrid}>
                             {sortedEvents.map((event, i) => (
                                 <EventCard key={event.year} event={event} index={i} />
@@ -91,10 +91,10 @@ export default function Home() {
                 {/* ── TIMELINE ── */}
                 <section className={styles.timeline}>
                     <div className={styles.container}>
-                        <div className={styles.sectionHeader}>
+                        <FadeInBox className={styles.sectionHeader}>
                             <p className={styles.sectionEyebrow}>The Journey</p>
                             <h2 className={styles.sectionTitle}>Four Years at a Glance</h2>
-                        </div>
+                        </FadeInBox>
                         <div className={styles.timelineList}>
                             {events.map((event, i) => (
                                 <TimelineItem key={event.year} event={event} index={i} />
@@ -105,17 +105,17 @@ export default function Home() {
 
                 {/* ── QUOTE BANNER ── */}
                 <section className={styles.quoteBanner}>
-                    <div className={styles.container}>
+                    <FadeInBox className={styles.container}>
                         <p className={styles.quoteText}>
                             "The best of people are those who are most beneficial to others."
                         </p>
                         <p className={styles.quoteAuthor}>— Al-Muʿjam al-Awsat (al-Tabarani), Hadith 6192.</p>
-                    </div>
+                    </FadeInBox>
                 </section>
 
                 {/* ── ABOUT ── */}
                 <section className={styles.about} id="about">
-                    <div className={styles.container}>
+                    <FadeInBox className={styles.container}>
                         <div className={styles.aboutInner}>
                             <div>
                                 <p className={styles.aboutLabel}>About the Committee</p>
@@ -139,7 +139,7 @@ export default function Home() {
                                 ))}
                             </div>
                         </div>
-                    </div>
+                    </FadeInBox>
                 </section>
 
                 {/* ── FOOTER ── */}
@@ -197,5 +197,28 @@ function TimelineItem({ event, index }) {
                 <div className={styles.timelineGuests}>{event.attendees.toLocaleString()} guests · {event.venue.split(',')[0]}</div>
             </div>
         </Link>
+    );
+}
+
+function FadeInBox({ children, className = '' }) {
+    const [isVisible, setIsVisible] = useState(false);
+    const ref = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) {
+                setIsVisible(true);
+                observer.unobserve(entry.target);
+            }
+        }, { threshold: 0.15 });
+
+        if (ref.current) observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        <div ref={ref} className={`${className} ${styles.fadeInBox} ${isVisible ? styles.visible : ''}`}>
+            {children}
+        </div>
     );
 }
