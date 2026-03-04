@@ -12,26 +12,23 @@
     border: 1px solid rgba(240, 235, 227, 0.06);
     cursor: pointer;
     opacity: 0;
-    transform: translateY(30px) scale(0.97);
-    filter: blur(4px);
+    transform: translateY(40px);
     transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease), border-color 0.45s var(--ease);
 }
 
 .visible {
-    animation: cardIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation: cardIn 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @keyframes cardIn {
     0% {
         opacity: 0;
-        transform: translateY(30px) scale(0.97);
-        filter: blur(4px);
+        transform: translateY(40px);
     }
 
     100% {
         opacity: 1;
-        transform: translateY(0) scale(1);
-        filter: blur(0);
+        transform: translateY(0);
     }
 }
 

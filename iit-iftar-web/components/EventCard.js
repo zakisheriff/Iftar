@@ -35,7 +35,7 @@ export default function EventCard({ event, index }) {
             style={{
                 '--accent': event.accentColor,
                 '--accent-light': event.accentLight,
-                animationDelay: `${(index % 2) * 0.15}s`,
+                animationDelay: `${(index % 4) * 0.12}s`,
             }}
         >
             {/* Cover image */}

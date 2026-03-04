@@ -6,6 +6,17 @@
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
+  animation: pageFadeIn 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes pageFadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 /* ── HERO ─────────────────────────────────── */
@@ -26,13 +37,13 @@
   z-index: 1;
   text-align: center;
   max-width: 780px;
-  animation: fadeUp 1s var(--ease-out) both;
+  animation: fadeUp 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
 }
 
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(32px);
+    transform: translateY(20px);
   }
 
   to {
