@@ -629,13 +629,13 @@
         }
 
         .confirm-box {
-            background: var(--card);
-            border: 1px solid var(--border);
+            background: #1a2e24;
+            border: 1px solid rgba(59, 107, 88, 0.35);
             border-radius: 24px;
             padding: 32px 28px;
             width: 320px;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
         }
 
         .confirm-icon {
@@ -1452,12 +1452,16 @@
 
             if (!iitId) return;
 
+            // Show loading spinner (same as QR scan)
+            loadingOverlay.classList.add("show");
+
             var separator = APPS_SCRIPT_URL.indexOf('?') !== -1 ? '&' : '?';
             var url = APPS_SCRIPT_URL + separator + 'action=manualMark&iit_id=' + encodeURIComponent(iitId);
 
             fetch(url)
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
+                    loadingOverlay.classList.remove("show");
                     if (data.status === 'success') {
                         showResult('success', 'success', 'Manually Admitted', data.name || name, data.iit_id || iitId);
                         addLog('success', data.name || name, data.iit_id || iitId, 'Manual override');
@@ -1474,6 +1478,7 @@
                     }
                 })
                 .catch(function () {
+                    loadingOverlay.classList.remove("show");
                     alert('Network error. Check your connection.');
                 });
         }

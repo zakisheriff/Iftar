@@ -400,6 +400,13 @@ def build_email(to_email: str, name: str, iit_id: str,
     margin:0;
     line-height:1.3;
   }}
+  .map-link {{
+    color:#f0e6c8 !important;
+    text-decoration:underline;
+    text-decoration-color:rgba(197,163,88,0.35);
+    text-underline-offset:3px;
+    cursor:pointer;
+  }}
 
   /* ── PREFERENCE CHIPS ── */
   .chips {{
@@ -431,61 +438,61 @@ def build_email(to_email: str, name: str, iit_id: str,
   }}
 </style>
 </head>
-<body>
-<div class="email-outer">
-<div class="wrapper">
+<body style="margin:0;padding:0;background-color:#0b1512 !important;font-family:'Inter',Arial,sans-serif;">
+<div style="background-color:#0b1512 !important;padding:32px 16px;">
+<div style="max-width:560px;margin:0 auto;background-color:#0f1e17 !important;border-radius:28px;overflow:hidden;border:1px solid rgba(197,163,88,0.25);box-shadow:0 24px 80px rgba(0,0,0,0.6);">
 
   <!-- HEADER -->
-  <div class="header">
+  <div style="background-color:#0a1a10 !important;padding:36px 24px 28px;text-align:center;border-bottom:1px solid rgba(197,163,88,0.2);">
     <img src="https://drive.google.com/uc?export=view&id=1yZOAcZWugkGxNs8fV2uzhgXQrW4XWgym" width="100" alt="IIT Iftar Logo" style="display:block;margin:0 auto;">
-    <div class="header-subtitle">Echoes of Arabia &mdash; Your Entry Pass</div>
-    <div class="header-tagline">Some stories never fade; they just echo.</div>
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:700;color:#c5a358 !important;margin:18px 0 6px;letter-spacing:0.3px;">Echoes of Arabia &mdash; Your Entry Pass</div>
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:14px;color:rgba(197,163,88,0.6) !important;margin:0;">Some stories never fade; they just echo.</div>
   </div>
 
   <!-- BODY -->
-  <div class="body">
-    <div class="salam">As-salamu Alaikum,</div>
-    <div class="name">{name}</div>
-    <div class="iitid-tag">&#9670; &nbsp;IIT ID &nbsp;{iit_id}&nbsp; &#9670;</div>
+  <div style="background-color:#0f1e17 !important;padding:40px 36px;text-align:center;">
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:rgba(197,163,88,0.6) !important;margin:0 0 8px;">As-salamu Alaikum,</div>
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:34px;font-weight:700;color:#f0e6c8 !important;margin:0 0 6px;line-height:1.1;">{name}</div>
+    <div style="display:inline-block;background-color:rgba(197,163,88,0.1) !important;border:1px solid rgba(197,163,88,0.2);border-radius:50px;padding:4px 14px;font-size:12px;color:rgba(197,163,88,0.75) !important;letter-spacing:1.5px;margin-bottom:28px;">&#9670; &nbsp;IIT ID &nbsp;{iit_id}&nbsp; &#9670;</div>
 
-    <div class="divider">
-      <div class="divider-line"></div>
-      <div class="divider-icon">&#9790;</div>
-      <div class="divider-line right"></div>
+    <div style="display:flex;align-items:center;gap:12px;margin:0 0 28px;">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(197,163,88,0.25));"></div>
+      <div style="color:rgba(197,163,88,0.5) !important;font-size:16px;">&#9790;</div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(197,163,88,0.25),transparent);"></div>
     </div>
 
-    <div class="msg">
-      Your seat at <strong>{EVENT_NAME}</strong> is confirmed.<br>
+    <div style="font-size:14px;color:rgba(240,230,200,0.6) !important;line-height:1.8;margin:0 0 32px;">
+      Your seat at <strong style="color:#c5a358 !important;">{EVENT_NAME}</strong> is confirmed.<br>
       Show this QR code at the venue entrance &mdash; it is yours alone<br>
-      and valid for a <strong>single scan only</strong>.
+      and valid for a <strong style="color:#c5a358 !important;">single scan only</strong>.
     </div>
 
     <!-- QR CODE -->
-    <div class="qr-card">
-      <img src="cid:qrcode" width="220" height="220" alt="Entry QR Code">
+    <div style="display:inline-block;background:linear-gradient(145deg,#ffffff,#f8f4ee);border-radius:20px;padding:24px;box-shadow:0 0 0 1px rgba(197,163,88,0.3),0 8px 32px rgba(0,0,0,0.4);margin-bottom:12px;">
+      <img src="cid:qrcode" width="220" height="220" alt="Entry QR Code" style="display:block;border-radius:8px;">
     </div>
-    <div class="qr-label">&#9670; &nbsp; Scan at entrance &nbsp; &#9670;</div>
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(197,163,88,0.45) !important;margin:14px 0 32px;">&#9670; &nbsp; Scan at entrance &nbsp; &#9670;</div>
 
     <!-- WARNING -->
-    <div class="warn-box">
-      <strong>&#9888; Important</strong>
+    <div style="background-color:rgba(197,163,88,0.05) !important;border:1px solid rgba(197,163,88,0.15);border-left:3px solid rgba(197,163,88,0.5);border-radius:12px;padding:16px 20px;text-align:left;margin-bottom:28px;font-size:13px;color:rgba(240,230,200,0.55) !important;line-height:1.7;">
+      <strong style="display:block;color:rgba(197,163,88,0.8) !important;font-size:12px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">&#9888; Important</strong>
       Do not share this QR code. It becomes void after the first scan.
       A screenshot on your phone is perfectly fine.
     </div>
 
-    <!-- EVENT DETAILS — centered 3-col -->
-    <div class="event-box">
-      <div class="event-col">
-        <div class="event-col-label">Date</div>
-        <div class="event-col-val">{EVENT_DATE}</div>
+    <!-- EVENT DETAILS -->
+    <div style="background-color:rgba(255,255,255,0.03) !important;border:1px solid rgba(197,163,88,0.12);border-radius:16px;padding:24px 16px;margin-bottom:8px;display:flex;justify-content:center;">
+      <div style="flex:1;text-align:center;padding:0 12px;border-right:1px solid rgba(197,163,88,0.1);">
+        <div style="font-size:10px;color:rgba(197,163,88,0.5) !important;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px;font-weight:600;">Date</div>
+        <div style="font-size:14px;color:#f0e6c8 !important;font-weight:500;">{EVENT_DATE}</div>
       </div>
-      <div class="event-col">
-        <div class="event-col-label">Time</div>
-        <div class="event-col-val">{EVENT_TIME}</div>
+      <div style="flex:1;text-align:center;padding:0 12px;border-right:1px solid rgba(197,163,88,0.1);">
+        <div style="font-size:10px;color:rgba(197,163,88,0.5) !important;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px;font-weight:600;">Time</div>
+        <div style="font-size:14px;color:#f0e6c8 !important;font-weight:500;">{EVENT_TIME}</div>
       </div>
-      <div class="event-col">
-        <div class="event-col-label">Venue</div>
-        <div class="event-col-val">{EVENT_VENUE}</div>
+      <div style="flex:1;text-align:center;padding:0 12px;">
+        <div style="font-size:10px;color:rgba(197,163,88,0.5) !important;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px;font-weight:600;">Venue</div>
+        <div style="font-size:14px;font-weight:500;"><a href="https://maps.google.com/?q=Temple+Trees+Colombo+Sri+Lanka" style="color:#f0e6c8 !important;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(197,163,88,0.35);" target="_blank">{EVENT_VENUE}</a></div>
       </div>
     </div>
 
@@ -493,7 +500,7 @@ def build_email(to_email: str, name: str, iit_id: str,
   </div>
 
   <!-- FOOTER -->
-  <div class="footer">
+  <div style="background-color:#0a1410 !important;border-top:1px solid rgba(197,163,88,0.1);padding:20px 32px;text-align:center;font-size:11px;color:rgba(240,230,200,0.25) !important;letter-spacing:0.5px;">
     IIT IFTAR COMMITTEE &nbsp;&#183;&nbsp; This is an automated message &mdash; please do not reply
   </div>
 
