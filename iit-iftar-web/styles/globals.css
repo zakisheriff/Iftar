@@ -56,8 +56,6 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-  max-width: 100vw;
 }
 
 body {
@@ -67,6 +65,8 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   max-width: 100vw;
+  overscroll-behavior-y: none;
+  /* prevent iOS elastic bounce causing layout shift */
 }
 
 a {
@@ -128,14 +128,34 @@ button {
 /* ── Global Background Layer ── */
 .global-bg {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* 100svh = small viewport height — NEVER changes when iOS URL bar hides/shows.
+     inset:0 or 100vh would resize on every scroll, causing the background jank. */
+  height: 100svh;
+  /* Fallback for browsers without svh support */
+  height: 100vh;
+  height: 100svh;
   z-index: -1;
   background:
     radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201, 169, 110, 0.08) 0%, transparent 70%),
     radial-gradient(ellipse 60% 40% at 90% 80%, rgba(61, 122, 95, 0.12) 0%, transparent 60%),
     radial-gradient(ellipse 50% 40% at 10% 60%, rgba(201, 169, 110, 0.06) 0%, transparent 60%),
     var(--ink);
+  /* Own GPU layer — prevents background repaints from blocking scroll */
+  will-change: transform;
+  transform: translateZ(0);
 }
+
+@media (max-width: 768px) {
+
+  /* On mobile stop animating the orb — continuous animation blocks scroll compositing */
+  .global-orb3 {
+    animation: none;
+  }
+}
+
 
 .global-bg::before {
   content: '';

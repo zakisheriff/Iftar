@@ -5,7 +5,8 @@
 .main {
   position: relative;
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100svh;
+  /* svh = stable, never changes with iOS URL bar */
   animation: pageFadeIn 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
@@ -22,7 +23,8 @@
 /* ── HERO ─────────────────────────────────── */
 .hero {
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100svh;
+  /* svh = small viewport = stable, dvh caused hero to grow/shrink on scroll */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -742,13 +744,13 @@
 
 .fadeInBox {
   opacity: 0;
-  transform: translateY(30px);
-  filter: blur(4px);
-  transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: translateY(24px);
+  /* No blur — it's expensive on mobile GPU and causes scroll stutter */
+  transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity, transform;
 }
 
 .fadeInBoxVisible {
   opacity: 1;
   transform: translateY(0);
-  filter: blur(0);
 }

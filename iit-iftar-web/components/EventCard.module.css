@@ -52,6 +52,26 @@
         aspect-ratio: 3/4;
     }
 
+    /* Disable hover transforms on touch devices — they ghost-trigger mid-scroll */
+    .card:hover {
+        transform: none;
+        box-shadow: none;
+        border-color: rgba(240, 235, 227, 0.06);
+    }
+
+    .card:hover .image {
+        transform: none;
+    }
+
+    .body {
+        transform: none !important;
+        /* prevent hover 4px jump on touch */
+    }
+
+    .card:hover .body {
+        transform: none;
+    }
+
     .quote {
         display: none !important;
     }
