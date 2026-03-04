@@ -157,6 +157,7 @@ def build_email(to_email: str, name: str, iit_id: str,
   .email-outer {{
     background:#0b1512 !important;
     padding:32px 16px;
+    border-radius:28px;
   }}
   .wrapper {{
     max-width:560px;
@@ -436,9 +437,8 @@ def build_email(to_email: str, name: str, iit_id: str,
 <!-- Outer bgcolor table — Gmail cannot strip HTML attributes -->
 <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#0b1512" style="background-color:#0b1512 !important;">
 <tr><td align="center" bgcolor="#0b1512" style="background-color:#0b1512 !important;padding:32px 16px;">
-<!-- Inner wrapper -->
-<table width="560" border="0" cellpadding="0" cellspacing="0" style="max-width:560px;background-color:#0f1e17 !important;border-radius:28px;overflow:hidden;border:1px solid rgba(197,163,88,0.25);box-shadow:0 24px 80px rgba(0,0,0,0.6);">
-<tr><td bgcolor="#0f1e17" style="background-color:#0f1e17 !important;border-radius:28px;">
+<!-- Card with true rounded corners — only div clips child overflow -->
+<div style="max-width:560px;margin:0 auto;background-color:#0f1e17 !important;border-radius:28px;overflow:hidden;border:1px solid rgba(197,163,88,0.25);box-shadow:0 24px 80px rgba(0,0,0,0.6);">
 
   <!-- HEADER -->
   <div style="background-color:#0a1a10 !important;padding:36px 24px 28px;text-align:center;border-bottom:1px solid rgba(197,163,88,0.2);">
@@ -502,11 +502,12 @@ def build_email(to_email: str, name: str, iit_id: str,
     IIT IFTAR COMMITTEE &nbsp;&#183;&nbsp; This is an automated message &mdash; please do not reply
   </div>
 
-</td></tr>
-</table>
+</div>
+<!-- end card -->
 </td></tr>
 </table>
 </body></html>"""
+
 
     msg = MIMEMultipart("related")
     msg["From"]    = f"{SENDER_NAME} <{SENDER_EMAIL}>"
