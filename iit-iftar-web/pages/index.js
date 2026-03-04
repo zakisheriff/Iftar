@@ -95,11 +95,11 @@ export default function Home() {
                             <p className={styles.sectionEyebrow}>The Journey</p>
                             <h2 className={styles.sectionTitle}>Four Years at a Glance</h2>
                         </FadeInBox>
-                        <div className={styles.timelineList}>
+                        <FadeInBox className={styles.timelineList}>
                             {events.map((event, i) => (
                                 <TimelineItem key={event.year} event={event} index={i} />
                             ))}
-                        </div>
+                        </FadeInBox>
                     </div>
                 </section>
 
