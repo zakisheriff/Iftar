@@ -126,33 +126,48 @@ def make_qr_bytes(iit_id: str) -> bytes:
 def build_email(to_email: str, name: str, iit_id: str,
                 food: str, photobooth: str, camera360: str) -> MIMEMultipart:
 
-    # Build preference chips
+    # Preference chips — food excluded, kept minimal
     chips = ""
-    if food:       chips += f'<span class="chip">{food}</span>'
     if photobooth: chips += f'<span class="chip">Photobooth: {photobooth}</span>'
     if camera360:  chips += f'<span class="chip">360&deg; Camera: {camera360}</span>'
     chips_block = f'<div class="chips">{chips}</div>' if chips else ""
 
     html = f"""<!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="color-scheme:light !important;">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
 <style>
+  :root {{ color-scheme: light !important; }}
+  @media (prefers-color-scheme: dark) {{
+    body {{ background:#0b1512 !important; color:#f0e6c8 !important; }}
+    .email-outer {{ background:#0b1512 !important; }}
+    .wrapper {{ background:#0f1e17 !important; }}
+    .header {{ background:#0a1a10 !important; }}
+    .body {{ background:#0f1e17 !important; }}
+    .footer {{ background:#0a1410 !important; }}
+    .event-box {{ background:rgba(255,255,255,0.03) !important; }}
+    .warn-box {{ background:rgba(197,163,88,0.05) !important; }}
+    .iitid-tag {{ background:rgba(197,163,88,0.1) !important; }}
+    .chip {{ background:rgba(197,163,88,0.08) !important; }}
+  }}
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
   body {{
     margin:0; padding:0;
-    background:#0b1512;
+    background:#0b1512 !important;
     font-family:'Inter',Arial,sans-serif;
+    -webkit-text-size-adjust:100%;
   }}
   .email-outer {{
-    background:#0b1512;
+    background:#0b1512 !important;
     padding:32px 16px;
   }}
   .wrapper {{
     max-width:560px;
     margin:0 auto;
-    background:#0f1e17;
+    background:#0f1e17 !important;
     border-radius:28px;
     overflow:hidden;
     border:1px solid rgba(197,163,88,0.25);
@@ -161,12 +176,25 @@ def build_email(to_email: str, name: str, iit_id: str,
 
   /* ── HEADER ── */
   .header {{
-    position:relative;
-    background:linear-gradient(160deg,#0a1a10 0%,#122418 60%,#0d1c14 100%);
-    padding:0;
+    background:#0a1a10 !important;
+    padding:36px 24px 28px;
     text-align:center;
-    overflow:hidden;
     border-bottom:1px solid rgba(197,163,88,0.2);
+  }}
+  .header-subtitle {{
+    font-family:'Cormorant Garamond',serif;
+    font-size:18px;
+    font-weight:700;
+    color:#c5a358 !important;
+    margin:18px 0 6px;
+    letter-spacing:0.3px;
+  }}
+  .header-tagline {{
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic;
+    font-size:14px;
+    color:rgba(197,163,88,0.55) !important;
+    margin:0;
   }}
   .header-pattern {{
     width:100%;
@@ -342,44 +370,35 @@ def build_email(to_email: str, name: str, iit_id: str,
     background:rgba(255,255,255,0.03);
     border:1px solid rgba(197,163,88,0.12);
     border-radius:16px;
-    padding:20px 24px;
+    padding:24px 16px;
     margin-bottom:8px;
-  }}
-  .event-row {{
     display:flex;
-    align-items:center;
-    gap:12px;
-    padding:8px 0;
-    border-bottom:1px solid rgba(197,163,88,0.08);
-    font-size:13px;
+    justify-content:center;
+    gap:0;
   }}
-  .event-row:last-child {{
-    border-bottom:none;
-    padding-bottom:0;
-  }}
-  .event-row:first-child {{
-    padding-top:0;
-  }}
-  .event-icon {{
-    color:rgba(197,163,88,0.6);
-    font-size:16px;
-    width:20px;
-    text-align:center;
-    flex-shrink:0;
-  }}
-  .event-label {{
-    color:rgba(240,230,200,0.4);
-    font-size:11px;
-    width:48px;
-    flex-shrink:0;
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-  }}
-  .event-val {{
-    color:#f0e6c8;
-    font-weight:500;
+  .event-col {{
     flex:1;
-    text-align:right;
+    text-align:center;
+    padding:0 12px;
+    border-right:1px solid rgba(197,163,88,0.1);
+  }}
+  .event-col:last-child {{
+    border-right:none;
+  }}
+  .event-col-label {{
+    font-size:10px;
+    color:rgba(197,163,88,0.5) !important;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin:0 0 6px;
+    font-weight:600;
+  }}
+  .event-col-val {{
+    font-size:14px;
+    color:#f0e6c8 !important;
+    font-weight:500;
+    margin:0;
+    line-height:1.3;
   }}
 
   /* ── PREFERENCE CHIPS ── */
@@ -416,9 +435,11 @@ def build_email(to_email: str, name: str, iit_id: str,
 <div class="email-outer">
 <div class="wrapper">
 
-  <!-- HEADER: logo only -->
+  <!-- HEADER -->
   <div class="header">
-    <img src="https://drive.google.com/uc?export=view&id=1yZOAcZWugkGxNs8fV2uzhgXQrW4XWgym" width="110" alt="IIT Iftar Logo" style="display:block; margin:0 auto;">
+    <img src="https://drive.google.com/uc?export=view&id=1yZOAcZWugkGxNs8fV2uzhgXQrW4XWgym" width="100" alt="IIT Iftar Logo" style="display:block;margin:0 auto;">
+    <div class="header-subtitle">Echoes of Arabia &mdash; Your Entry Pass</div>
+    <div class="header-tagline">Some stories never fade; they just echo.</div>
   </div>
 
   <!-- BODY -->
@@ -452,19 +473,19 @@ def build_email(to_email: str, name: str, iit_id: str,
       A screenshot on your phone is perfectly fine.
     </div>
 
-    <!-- EVENT DETAILS -->
+    <!-- EVENT DETAILS — centered 3-col -->
     <div class="event-box">
-      <div class="event-row">
-        <div class="event-label">Date</div>
-        <div class="event-val">{EVENT_DATE}</div>
+      <div class="event-col">
+        <div class="event-col-label">Date</div>
+        <div class="event-col-val">{EVENT_DATE}</div>
       </div>
-      <div class="event-row">
-        <div class="event-label">Time</div>
-        <div class="event-val">{EVENT_TIME}</div>
+      <div class="event-col">
+        <div class="event-col-label">Time</div>
+        <div class="event-col-val">{EVENT_TIME}</div>
       </div>
-      <div class="event-row">
-        <div class="event-label">Venue</div>
-        <div class="event-val">{EVENT_VENUE}</div>
+      <div class="event-col">
+        <div class="event-col-label">Venue</div>
+        <div class="event-col-val">{EVENT_VENUE}</div>
       </div>
     </div>
 
