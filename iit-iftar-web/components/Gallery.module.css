@@ -73,8 +73,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
     border-bottom: 1px solid var(--border-2);
     padding-bottom: 24px;
+    flex-wrap: wrap;
 }
 
 @media (max-width: 768px) {
@@ -83,6 +85,63 @@
         align-items: flex-start;
         gap: 16px;
     }
+}
+
+/* ── Search area (toggle + form) ── */
+.searchArea {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .searchArea {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ── Mode toggle ── */
+.searchToggle {
+    display: flex;
+    background: rgba(13, 21, 17, 0.6);
+    border: 1px solid var(--border-2);
+    border-radius: 24px;
+    padding: 3px;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.searchToggleBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-3);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.searchToggleBtn:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.searchToggleActive {
+    background: rgba(201, 169, 110, 0.12) !important;
+    color: var(--gold) !important;
+    border: 1px solid rgba(201, 169, 110, 0.25) !important;
 }
 
 /* ── Drive badge ── */
@@ -104,12 +163,14 @@
 /* ── Search UI ── */
 .searchForm {
     position: relative;
-    width: 320px;
+    flex: 1;
+    min-width: 260px;
 }
 
 @media (max-width: 768px) {
     .searchForm {
         width: 100%;
+        flex: none;
     }
 }
 
@@ -185,6 +246,181 @@
     background: var(--gold);
     color: var(--ink);
     border-color: var(--gold);
+}
+
+/* AI mode search input wrapper glow */
+.searchWrapperAi:focus-within,
+.searchWrapperAi {
+    border-color: rgba(201, 169, 110, 0.3);
+    background: rgba(13, 21, 17, 0.8);
+}
+
+.searchButtonAi {
+    background: linear-gradient(135deg, rgba(201, 169, 110, 0.2), rgba(180, 140, 80, 0.1));
+    border-color: rgba(201, 169, 110, 0.4) !important;
+}
+
+.searchButton:disabled {
+    opacity: 0.7;
+    cursor: wait;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
+}
+
+/* ── AI Thinking animation ── */
+.aiThinking {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 48px 20px;
+    background: rgba(13, 21, 17, 0.5);
+    border: 1px solid rgba(201, 169, 110, 0.12);
+    border-radius: 16px;
+    color: var(--text-2);
+    font-size: 15px;
+    text-align: center;
+}
+
+.aiThinking strong {
+    color: var(--gold);
+}
+
+.aiThinking em {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.aiThinkingHint {
+    font-size: 12px;
+    opacity: 0.5;
+    letter-spacing: 0.5px;
+}
+
+.aiThinkingDots {
+    display: flex;
+    gap: 8px;
+}
+
+.aiThinkingDots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.3;
+    animation: aiDotPulse 1.4s ease-in-out infinite;
+}
+
+.aiThinkingDots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.aiThinkingDots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes aiDotPulse {
+
+    0%,
+    80%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+
+    40% {
+        opacity: 1;
+        transform: scale(1.3);
+    }
+}
+
+/* ── AI Results summary bar ── */
+.aiResultsSummary {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gold);
+    background: rgba(201, 169, 110, 0.07);
+    border: 1px solid rgba(201, 169, 110, 0.15);
+    border-radius: 20px;
+    padding: 6px 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    align-self: flex-start;
+}
+
+/* ── AI Error banner ── */
+.aiErrorBanner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: rgba(200, 60, 60, 0.08);
+    border: 1px solid rgba(200, 60, 60, 0.2);
+    border-radius: 12px;
+    color: rgba(240, 150, 150, 0.9);
+    font-size: 14px;
+}
+
+/* ── AI Tip bar ── */
+.aiTip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background: rgba(201, 169, 110, 0.04);
+    border: 1px dashed rgba(201, 169, 110, 0.2);
+    border-radius: 10px;
+    color: var(--text-3);
+    font-size: 13px;
+}
+
+.aiTipBtn {
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-family: inherit;
+    transition: opacity 0.2s;
+}
+
+.aiTipBtn:hover {
+    opacity: 0.75;
+}
+
+/* ── AI Match Badge on thumbnails ── */
+.aiMatchBadge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(8, 13, 10, 0.75);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(201, 169, 110, 0.35);
+    color: var(--gold);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 2;
+    transition: var(--transition);
+}
+
+.aiMatchBadgeHigh {
+    background: rgba(201, 169, 110, 0.18);
+    border-color: rgba(201, 169, 110, 0.6);
+    color: #e8cd7a;
+    box-shadow: 0 0 10px rgba(201, 169, 110, 0.2);
 }
 
 .emptySearch {

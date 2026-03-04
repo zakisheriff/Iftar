@@ -99,6 +99,8 @@ export default async function handler(req, res) {
             // Download still goes direct to Drive (triggers browser save dialog)
             download: `https://drive.google.com/uc?export=download&id=${file.id}`,
             name: file.name,
+            // Small Google-hosted thumbnail used directly by AI search (no proxy needed)
+            thumbnailLink: file.thumbnailLink || null,
         }));
 
         return res.status(200).json({
