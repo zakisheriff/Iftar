@@ -613,6 +613,111 @@
             transform: translateY(-1px);
         }
 
+        /* ── MANUAL MARK MODAL ─────────────────────────────── */
+        .confirm-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-overlay.show {
+            display: flex;
+        }
+
+        .confirm-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px 28px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .confirm-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(59, 107, 88, 0.12);
+            border: 1px solid rgba(59, 107, 88, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .confirm-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .confirm-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 3px;
+        }
+
+        .confirm-iitid {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 20px;
+        }
+
+        .confirm-msg {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .confirm-cancel {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .confirm-cancel:hover {
+            background: var(--border);
+        }
+
+        .confirm-ok {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            background: var(--primary);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .confirm-ok:hover {
+            opacity: 0.85;
+        }
+
         .list-empty {
             text-align: center;
             color: var(--muted);
@@ -1319,20 +1424,36 @@
         }
 
         // ================================================================
-        //  MANUAL MARK (fallback when QR unavailable)
+        //  MANUAL MARK — uses custom modal instead of browser confirm()
         // ================================================================
+        var _pendingIitId = null;
+        var _pendingName = null;
+
         function manualMark(iitId, name) {
             if (!iitId) {
-                alert('No IIT ID found for this student. Cannot mark manually.');
+                alert('No IIT ID found for this student.');
                 return;
             }
-            var confirmed = confirm(
-                'MANUAL OVERRIDE\n\n' +
-                'Student: ' + name + '\n' +
-                'IIT ID:  ' + iitId + '\n\n' +
-                'Are you sure this student is physically present and attended?'
-            );
-            if (!confirmed) return;
+            _pendingIitId = iitId;
+            _pendingName = name;
+
+            document.getElementById('confirmName').textContent = name || 'Unknown';
+            document.getElementById('confirmIitId').textContent = 'IIT ID: ' + iitId;
+            document.getElementById('confirmOverlay').classList.add('show');
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirmOverlay').classList.remove('show');
+            _pendingIitId = null;
+            _pendingName = null;
+        }
+
+        function doManualMark() {
+            var iitId = _pendingIitId;
+            var name = _pendingName;
+            closeConfirm();
+
+            if (!iitId) return;
 
             var separator = APPS_SCRIPT_URL.indexOf('?') !== -1 ? '&' : '?';
             var url = APPS_SCRIPT_URL + separator + 'action=manualMark&iit_id=' + encodeURIComponent(iitId);
@@ -1341,18 +1462,22 @@
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     if (data.status === 'success') {
-                        showResult('success', 'success', 'Manually Admitted', data.name, data.iit_id);
+                        showResult('success', 'success', 'Manually Admitted', data.name || name, data.iit_id || iitId);
                         addLog('success', data.name || name, data.iit_id || iitId, 'Manual override');
+                        stats.total++; stats.ok++;
+                        updateStats();
                         fetchMasterList();
                     } else if (data.status === 'already_used') {
-                        showResult('used', 'used', 'Already Checked In', data.name, data.iit_id);
+                        showResult('used', 'used', 'Already Checked In', data.name || name, data.iit_id || iitId);
                         addLog('used', data.name || name, data.iit_id || iitId, 'Already admitted');
+                        stats.total++; stats.dup++;
+                        updateStats();
                     } else {
                         alert('Error: ' + (data.message || 'Unknown error'));
                     }
                 })
                 .catch(function () {
-                    alert('Network error. Check your internet connection.');
+                    alert('Network error. Check your connection.');
                 });
         }
 
@@ -1367,6 +1492,27 @@
             renderStudentList();
         }
     </script>
+    <!-- MANUAL MARK CONFIRMATION MODAL -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-box">
+            <div class="confirm-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+            </div>
+            <div class="confirm-title">Manual Override</div>
+            <div class="confirm-name" id="confirmName"></div>
+            <div class="confirm-iitid" id="confirmIitId"></div>
+            <div class="confirm-msg">Is this student physically present at the venue?</div>
+            <div class="confirm-actions">
+                <button class="confirm-cancel" onclick="closeConfirm()">Cancel</button>
+                <button class="confirm-ok" id="confirmOkBtn" onclick="doManualMark()">Yes, Admit</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

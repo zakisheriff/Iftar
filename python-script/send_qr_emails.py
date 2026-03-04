@@ -126,68 +126,364 @@ def make_qr_bytes(iit_id: str) -> bytes:
 def build_email(to_email: str, name: str, iit_id: str,
                 food: str, photobooth: str, camera360: str) -> MIMEMultipart:
 
-    food_line  = f"<br>🍽️ Food: <strong>{food}</strong>"           if food       else ""
-    photo_line = f"<br>📸 Photobooth: <strong>{photobooth}</strong>" if photobooth else ""
-    cam_line   = f"<br>🎥 360° Camera: <strong>{camera360}</strong>"  if camera360  else ""
+    # Build preference chips
+    chips = ""
+    if food:       chips += f'<span class="chip">{food}</span>'
+    if photobooth: chips += f'<span class="chip">Photobooth: {photobooth}</span>'
+    if camera360:  chips += f'<span class="chip">360&deg; Camera: {camera360}</span>'
+    chips_block = f'<div class="chips">{chips}</div>' if chips else ""
 
     html = f"""<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  body {{ margin:0; padding:0; background:#eae3d9; font-family:Arial,sans-serif; color:#1a2f26; }}
-  .wrapper {{ max-width:580px; margin:40px auto; background:#f5f0eb; border-radius:35px; overflow:hidden; border:1px solid rgba(59,107,88,0.15); box-shadow:0 10px 40px rgba(59,107,88,0.08); }}
-  .header {{ background:#eae3d9; padding:40px 32px; text-align:center; border-bottom:1px solid rgba(59,107,88,0.1); }}
-  .title {{ font-size:26px; font-weight:bold; color:#1a2f26; letter-spacing:1px; margin:0; }}
-  .subtitle {{ font-size:16px; color:#3b6b58; margin:8px 0 0; font-weight:700; }}
-  .theme {{ font-size:13px; color:rgba(26,47,38,0.6); margin-top:10px; font-style:italic; }}
-  .body {{ padding:40px 32px; text-align:center; }}
-  .greeting {{ font-size:18px; color:#3b6b58; margin-bottom:10px; font-weight:bold; }}
-  .name {{ font-size:24px; font-weight:bold; color:#1a2f26; margin-bottom:6px; }}
-  .iit-id {{ font-size:13px; color:#5a7368; margin-bottom:24px; }}
-  .msg {{ font-size:15px; color:#5a7368; line-height:1.7; margin-bottom:32px; }}
-  .qr-wrapper {{ display:inline-block; padding:20px; background:#fff; border-radius:24px; border:1px solid rgba(59,107,88,0.15); margin-bottom:32px; box-shadow:0 4px 12px rgba(59,107,88,0.04); }}
-  .qr-box img {{ display:block; border-radius:8px; }}
-  .note {{ background:rgba(59,107,88,0.05); border:1px solid rgba(59,107,88,0.15); border-radius:20px; padding:20px; font-size:14px; color:#3b6b58; margin-bottom:32px; text-align:left; line-height:1.6; }}
-  .note strong {{ display:block; margin-bottom:6px; font-size:15px; }}
-  .details {{ font-size:14px; color:#5a7368; background:#eae3d9; padding:16px 24px; border-radius:20px; display:inline-block; }}
-  .details span {{ color:#1a2f26; font-weight:bold; }}
-  .footer {{ border-top:1px solid rgba(59,107,88,0.15); padding:24px 32px; text-align:center; font-size:13px; color:#5a7368; background:#eae3d9; }}
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+  body {{
+    margin:0; padding:0;
+    background:#0b1512;
+    font-family:'Inter',Arial,sans-serif;
+  }}
+  .email-outer {{
+    background:#0b1512;
+    padding:32px 16px;
+  }}
+  .wrapper {{
+    max-width:560px;
+    margin:0 auto;
+    background:#0f1e17;
+    border-radius:28px;
+    overflow:hidden;
+    border:1px solid rgba(197,163,88,0.25);
+    box-shadow:0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(197,163,88,0.08);
+  }}
+
+  /* ── HEADER ── */
+  .header {{
+    position:relative;
+    background:linear-gradient(160deg,#0a1a10 0%,#122418 60%,#0d1c14 100%);
+    padding:0;
+    text-align:center;
+    overflow:hidden;
+    border-bottom:1px solid rgba(197,163,88,0.2);
+  }}
+  .header-pattern {{
+    width:100%;
+    display:block;
+    opacity:0.18;
+  }}
+  .header-inner {{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:36px 24px;
+  }}
+  .logo-wrap {{
+    width:80px; height:80px;
+    border-radius:50%;
+    background:rgba(197,163,88,0.08);
+    border:1px solid rgba(197,163,88,0.25);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:20px;
+    overflow:hidden;
+  }}
+  .header-eyebrow {{
+    font-family:'Inter',sans-serif;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:rgba(197,163,88,0.7);
+    margin-bottom:10px;
+  }}
+  .header-title {{
+    font-family:'Cormorant Garamond',serif;
+    font-size:32px;
+    font-weight:700;
+    color:#f0e6c8;
+    margin:0 0 6px;
+    letter-spacing:0.5px;
+    line-height:1.15;
+  }}
+  .header-sub {{
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic;
+    font-size:15px;
+    color:rgba(197,163,88,0.65);
+    margin:0;
+  }}
+  .gold-line {{
+    width:60px; height:1px;
+    background:linear-gradient(90deg,transparent,#c5a358,transparent);
+    margin:16px auto 0;
+  }}
+
+  /* ── BODY ── */
+  .body {{
+    padding:40px 36px;
+    text-align:center;
+  }}
+  .salam {{
+    font-family:'Cormorant Garamond',serif;
+    font-size:15px;
+    font-style:italic;
+    color:rgba(197,163,88,0.6);
+    margin:0 0 8px;
+    letter-spacing:0.5px;
+  }}
+  .name {{
+    font-family:'Cormorant Garamond',serif;
+    font-size:34px;
+    font-weight:700;
+    color:#f0e6c8;
+    margin:0 0 6px;
+    line-height:1.1;
+  }}
+  .iitid-tag {{
+    display:inline-block;
+    background:rgba(197,163,88,0.1);
+    border:1px solid rgba(197,163,88,0.2);
+    border-radius:50px;
+    padding:4px 14px;
+    font-size:12px;
+    color:rgba(197,163,88,0.75);
+    letter-spacing:1.5px;
+    margin-bottom:28px;
+  }}
+  .divider {{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:0 0 28px;
+  }}
+  .divider-line {{
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg,transparent,rgba(197,163,88,0.25));
+  }}
+  .divider-line.right {{
+    background:linear-gradient(90deg,rgba(197,163,88,0.25),transparent);
+  }}
+  .divider-icon {{
+    color:rgba(197,163,88,0.5);
+    font-size:16px;
+  }}
+  .msg {{
+    font-size:14px;
+    color:rgba(240,230,200,0.6);
+    line-height:1.8;
+    margin:0 0 32px;
+  }}
+  .msg strong {{
+    color:#c5a358;
+    font-weight:600;
+  }}
+
+  /* ── QR CARD ── */
+  .qr-card {{
+    background:linear-gradient(145deg,#ffffff 0%,#f8f4ee 100%);
+    border-radius:20px;
+    padding:24px;
+    display:inline-block;
+    box-shadow:0 0 0 1px rgba(197,163,88,0.3), 0 8px 32px rgba(0,0,0,0.4), 0 0 60px rgba(197,163,88,0.06);
+    margin-bottom:12px;
+    position:relative;
+  }}
+  .qr-card::before {{
+    content:'';
+    position:absolute;
+    inset:-1px;
+    border-radius:21px;
+    background:linear-gradient(135deg,rgba(197,163,88,0.4),transparent 50%,rgba(197,163,88,0.2));
+    z-index:-1;
+  }}
+  .qr-card img {{
+    display:block;
+    border-radius:8px;
+  }}
+  .qr-label {{
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:rgba(197,163,88,0.45);
+    margin:14px 0 32px;
+  }}
+
+  /* ── WARNING BOX ── */
+  .warn-box {{
+    background:rgba(197,163,88,0.05);
+    border:1px solid rgba(197,163,88,0.15);
+    border-left:3px solid rgba(197,163,88,0.5);
+    border-radius:12px;
+    padding:16px 20px;
+    text-align:left;
+    margin-bottom:28px;
+    font-size:13px;
+    color:rgba(240,230,200,0.55);
+    line-height:1.7;
+  }}
+  .warn-box strong {{
+    display:block;
+    color:rgba(197,163,88,0.8);
+    font-size:12px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }}
+
+  /* ── EVENT DETAILS ── */
+  .event-box {{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(197,163,88,0.12);
+    border-radius:16px;
+    padding:20px 24px;
+    margin-bottom:8px;
+  }}
+  .event-row {{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:8px 0;
+    border-bottom:1px solid rgba(197,163,88,0.08);
+    font-size:13px;
+  }}
+  .event-row:last-child {{
+    border-bottom:none;
+    padding-bottom:0;
+  }}
+  .event-row:first-child {{
+    padding-top:0;
+  }}
+  .event-icon {{
+    color:rgba(197,163,88,0.6);
+    font-size:16px;
+    width:20px;
+    text-align:center;
+    flex-shrink:0;
+  }}
+  .event-label {{
+    color:rgba(240,230,200,0.4);
+    font-size:11px;
+    width:48px;
+    flex-shrink:0;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }}
+  .event-val {{
+    color:#f0e6c8;
+    font-weight:500;
+    flex:1;
+    text-align:right;
+  }}
+
+  /* ── PREFERENCE CHIPS ── */
+  .chips {{
+    margin:20px 0 0;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+  }}
+  .chip {{
+    background:rgba(197,163,88,0.08);
+    border:1px solid rgba(197,163,88,0.18);
+    border-radius:50px;
+    padding:5px 14px;
+    font-size:11px;
+    color:rgba(197,163,88,0.7);
+    letter-spacing:0.3px;
+  }}
+
+  /* ── FOOTER ── */
+  .footer {{
+    border-top:1px solid rgba(197,163,88,0.1);
+    background:#0a1410;
+    padding:20px 32px;
+    text-align:center;
+    font-size:11px;
+    color:rgba(240,230,200,0.25);
+    letter-spacing:0.5px;
+  }}
 </style>
 </head>
 <body>
+<div class="email-outer">
 <div class="wrapper">
+
+  <!-- HEADER: logo only -->
   <div class="header">
-    <div style="margin-bottom:24px;">
-      <img src="https://drive.google.com/uc?export=view&id=1yZOAcZWugkGxNs8fV2uzhgXQrW4XWgym" width="130" alt="Logo" style="display:inline-block;">
-    </div>
-    <div class="subtitle">Echoes of Arabia — Your Entry Pass</div>
-    <div class="theme">Some stories never fade; they just echo.</div>
+    <img src="https://drive.google.com/uc?export=view&id=1yZOAcZWugkGxNs8fV2uzhgXQrW4XWgym" width="110" alt="IIT Iftar Logo" style="display:block; margin:0 auto;">
   </div>
+
+  <!-- BODY -->
   <div class="body">
-    <div class="greeting">As-salamu Alaikum,</div>
+    <div class="salam">As-salamu Alaikum,</div>
     <div class="name">{name}</div>
-    <div class="iit-id">IIT ID: {iit_id}</div>
+    <div class="iitid-tag">&#9670; &nbsp;IIT ID &nbsp;{iit_id}&nbsp; &#9670;</div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-icon">&#9790;</div>
+      <div class="divider-line right"></div>
+    </div>
+
     <div class="msg">
-      You are registered for <strong style="color:#3b6b58">{EVENT_NAME}</strong>.<br>
-      Present this QR code at the entrance. It is unique to you<br>
-      and can only be scanned <strong style="color:#b91c1c">once</strong>.
+      Your seat at <strong>{EVENT_NAME}</strong> is confirmed.<br>
+      Show this QR code at the venue entrance &mdash; it is yours alone<br>
+      and valid for a <strong>single scan only</strong>.
     </div>
-    <div class="qr-wrapper"><div class="qr-box"><img src="cid:qrcode" width="240" height="240" alt="Your QR Code"></div></div>
-    <div class="note">
-      <strong>Important</strong>
-      Do not share this QR code. It will be invalidated after the first scan.
-      Screenshots are fine — just make sure it is visible and clear.
+
+    <!-- QR CODE -->
+    <div class="qr-card">
+      <img src="cid:qrcode" width="220" height="220" alt="Entry QR Code">
     </div>
-    <div class="details">Date: <span>{EVENT_DATE}</span> &nbsp;|&nbsp; Time: <span>{EVENT_TIME}</span> &nbsp;|&nbsp; Venue: <span>{EVENT_VENUE}</span></div>
+    <div class="qr-label">&#9670; &nbsp; Scan at entrance &nbsp; &#9670;</div>
+
+    <!-- WARNING -->
+    <div class="warn-box">
+      <strong>&#9888; Important</strong>
+      Do not share this QR code. It becomes void after the first scan.
+      A screenshot on your phone is perfectly fine.
+    </div>
+
+    <!-- EVENT DETAILS -->
+    <div class="event-box">
+      <div class="event-row">
+        <div class="event-label">Date</div>
+        <div class="event-val">{EVENT_DATE}</div>
+      </div>
+      <div class="event-row">
+        <div class="event-label">Time</div>
+        <div class="event-val">{EVENT_TIME}</div>
+      </div>
+      <div class="event-row">
+        <div class="event-label">Venue</div>
+        <div class="event-val">{EVENT_VENUE}</div>
+      </div>
+    </div>
+
+    {chips_block}
   </div>
-  <div class="footer">IIT Iftar Committee &nbsp;&middot;&nbsp; This is an automated email, please do not reply.</div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    IIT IFTAR COMMITTEE &nbsp;&#183;&nbsp; This is an automated message &mdash; please do not reply
+  </div>
+
+</div>
 </div>
 </body></html>"""
 
     msg = MIMEMultipart("related")
     msg["From"]    = f"{SENDER_NAME} <{SENDER_EMAIL}>"
     msg["To"]      = to_email
-    msg["Subject"] = f"Your Iftar Entry Pass — {EVENT_NAME}"
+    msg["Subject"] = f"Your Entry Pass — {EVENT_NAME} ✦"
     msg.attach(MIMEText(html, "html"))
 
     qr_img = MIMEImage(make_qr_bytes(iit_id), _subtype="png")
@@ -199,6 +495,7 @@ def build_email(to_email: str, name: str, iit_id: str,
 
 
 # ─── SEND VIA GMAIL API ────────────────────────────────────────────────────────
+
 
 def send_email(service, to_email: str, name: str, iit_id: str,
                food: str, photobooth: str, camera360: str) -> bool:
