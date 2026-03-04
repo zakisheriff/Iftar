@@ -1,0 +1,14 @@
+# OAuth credentials — NEVER commit these
+credentials.json
+token.json
+
+# Script outputs — not needed in repo
+responses_sent.csv
+sent_log.txt
+emailer.log
+qr_codes/
+
+# Python env
+venv/
+__pycache__/
+*.pyc
