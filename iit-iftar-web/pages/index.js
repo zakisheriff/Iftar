@@ -35,13 +35,12 @@ export default function Home() {
                                 priority
                             />
                         </div>
-                        <p className={styles.heroEyebrow}>IIT Iftar Committee</p>
                         <h1 className={styles.heroTitle}>
                             A Legacy of<br />
                             <span className={styles.heroAccent}>Togetherness</span>
                         </h1>
                         <p className={styles.heroSub}>
-                            Five years. Five themes. One unbroken thread of community.
+                            Four years. Four themes. One unbroken thread of community.
                             Relive every evening we gathered to break bread, share stories, and build something that lasts.
                         </p>
                         <div className={styles.heroActions}>
@@ -62,7 +61,7 @@ export default function Home() {
                                 </div>
                             </div>
                             <Link href="#events" className={styles.heroCta}>
-                                Explore the Archive
+                                Relive the Memories
                             </Link>
                         </div>
                     </div>
@@ -96,7 +95,7 @@ export default function Home() {
                     <div className={styles.container}>
                         <div className={styles.sectionHeader}>
                             <p className={styles.sectionEyebrow}>The Journey</p>
-                            <h2 className={styles.sectionTitle}>Five Years at a Glance</h2>
+                            <h2 className={styles.sectionTitle}>Four Years at a Glance</h2>
                         </div>
                         <div className={styles.timelineList}>
                             {events.map((event) => (
