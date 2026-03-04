@@ -1401,10 +1401,7 @@
                 var statusText = s.attended ? 'Admitted' : 'Pending';
 
                 var markBtn = s.attended ? '' :
-                    '<button class="mark-btn" onclick="manualMark(' +
-                    JSON.stringify(s.iit_id || '') + ',' +
-                    JSON.stringify(s.name || '') +
-                    ')">Mark Attended</button>';
+                    '<button class="mark-btn" data-iit-id="' + escapeHtml(s.iit_id || '') + '" data-name="' + escapeHtml(s.name || '') + '" onclick="manualMark(this.getAttribute(\'data-iit-id\'),this.getAttribute(\'data-name\'))">Mark Attended</button>';
 
                 return '<div class="student-item">' +
                     '<div class="student-status-dot ' + (s.attended ? 'status-admitted' : 'status-pending') + '"></div>' +
