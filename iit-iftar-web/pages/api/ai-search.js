@@ -1,9 +1,25 @@
 // pages/api/ai-search.js
 // AI-powered semantic photo search using Google Gemini Vision.
-//
-// The client pre-fetches thumbnails at w100 size and sends base64 directly.
-// This server just calls Gemini — no server-side image fetching at all.
-// ONE Gemini call for all images → fast, no rate limit issues.
+// Client pre-fetches thumbnails at w100 and sends base64 directly.
+// Server makes ONE Gemini call — no server-side image fetching.
+
+// Raise Next.js body limit — 348 photos × ~5KB base64 each ≈ 10–15 MB
+export const config = {
+    api: {
+        bodyParser: {
+            sizeLimit: '50mb',
+        },
+    },
+};
+
+// Only these MIME types are valid for Gemini inlineData
+const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+
+function normalizeMime(raw) {
+    // Strip parameters like "; charset=utf-8"
+    const base = (raw || '').split(';')[0].trim().toLowerCase();
+    return ALLOWED_MIME.has(base) ? base : 'image/jpeg';
+}
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -31,17 +47,18 @@ export default async function handler(req, res) {
     const parts = [
         {
             text:
-                `You are a strict photo relevance scorer for an event gallery search.\n` +
-                `The user is looking for: "${query.trim()}"\n\n` +
+                `You are a photo relevance scorer for an event photo gallery.\n` +
+                `The user is searching for: "${query.trim()}"\n\n` +
                 `You will see ${images.length} photos, each labeled with a Photo ID.\n` +
-                `Score each 0–100 based on how well the photo visually matches the search:\n` +
-                `  80–100 = clear, direct match (the described person/object is prominent)\n` +
-                `  50–79  = partial match (matches but not the main subject)\n` +
-                `  20–49  = loosely related (similar scene/type but not a match)\n` +
-                `  0–19   = does not match\n\n` +
-                `Be STRICT. Only score ≥ 50 if the match is clear and visible.\n` +
-                `Do NOT inflate scores. Photos without the described element should score ≤ 20.\n\n` +
-                `Reply ONLY with a JSON array, no markdown:\n` +
+                `Score each photo 0–100 based on visual match:\n` +
+                `  70–100 = clear match (described person/clothing/item clearly visible)\n` +
+                `  40–69  = partial match (present but not the focus, or partially visible)\n` +
+                `  20–39  = loosely related (similar but not a match)\n` +
+                `  0–19   = unrelated\n\n` +
+                `Important: these are small thumbnails so clothing colors may appear slightly different.\n` +
+                `If a photo likely contains the described person based on visible clothing/features, score ≥ 50.\n` +
+                `Do not over-filter — it's better to include a likely match than miss it.\n\n` +
+                `Reply ONLY with a JSON array, no markdown, no extra text:\n` +
                 `[{"id":"PHOTO_ID","score":NUMBER}, ...]`,
         },
     ];
@@ -50,7 +67,7 @@ export default async function handler(req, res) {
         if (!img.data || !img.id) continue;
         parts.push({
             inlineData: {
-                mimeType: img.mimeType || 'image/jpeg',
+                mimeType: normalizeMime(img.mimeType), // clean mime — no extra params
                 data: img.data,
             },
         });
@@ -66,7 +83,7 @@ export default async function handler(req, res) {
                 contents: [{ role: 'user', parts }],
                 generationConfig: {
                     temperature: 0.05,
-                    maxOutputTokens: 8192,
+                    maxOutputTokens: 32768,
                 },
             }),
         }
@@ -82,8 +99,8 @@ export default async function handler(req, res) {
     const geminiData = await geminiRes.json();
     const raw = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
 
-    // Extract JSON array (strip markdown fences if present)
-    const jsonMatch = raw.match(/\[[\s\S]*?\]/);
+    // Greedy match — captures the full JSON array (not just the first tiny match)
+    const jsonMatch = raw.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
         return res.status(200).json({ results: [] });
     }
@@ -96,5 +113,13 @@ export default async function handler(req, res) {
     }
 
     results.sort((a, b) => b.score - a.score);
-    return res.status(200).json({ results });
+    return res.status(200).json({
+        results,
+        // Debug fields — remove once working
+        _debug: {
+            rawPreview: raw.slice(0, 500),
+            parsedCount: results.length,
+            topScores: results.slice(0, 5).map(r => r.score),
+        },
+    });
 }

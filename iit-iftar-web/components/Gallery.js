@@ -92,7 +92,8 @@ export default function Gallery({ year, staticImages }) {
             // ── Step 2: Fetch all thumbnails at w100 in parallel (client-side) ──
             const fetchBase64 = (photo) =>
                 new Promise((resolve) => {
-                    const url = photo.thumb.replace(/sz=\w+/, 'sz=w100');
+                    // Swap w600 → w200: enough detail for color/clothing recognition
+                    const url = photo.thumb.replace(/sz=\w+/, 'sz=w200');
                     fetch(url)
                         .then((r) => {
                             if (!r.ok) return resolve(null);
@@ -126,6 +127,8 @@ export default function Gallery({ year, staticImages }) {
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'AI search failed');
+            // Debug — remove once working
+            if (data._debug) console.log('[AI Search Debug]', data._debug);
             setAiResults(data.results || []);
         } catch (err) {
             setAiError(err.message);
@@ -261,7 +264,7 @@ export default function Gallery({ year, staticImages }) {
         if (searchMode === 'ai' && aiResults) {
             // Filter to score >= 20, sorted by score desc
             return photos
-                .filter((p) => (scoreMap[p.id] ?? 0) >= 40)
+                .filter((p) => (scoreMap[p.id] ?? 0) >= 30)
                 .sort((a, b) => (scoreMap[b.id] ?? 0) - (scoreMap[a.id] ?? 0));
         }
         return photos;
