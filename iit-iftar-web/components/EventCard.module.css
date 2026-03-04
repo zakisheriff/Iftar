@@ -47,7 +47,15 @@
 
     .card,
     .featured {
-        aspect-ratio: 4/5;
+        aspect-ratio: 3/4;
+    }
+
+    .quote {
+        display: none !important;
+    }
+
+    .body {
+        padding: 20px;
     }
 }
 
