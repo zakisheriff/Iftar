@@ -678,11 +678,11 @@
   }
 
   .timeline::before {
-    left: 119px;
+    left: 50%;
   }
 
   .timelineItem {
-    grid-template-columns: 80px 30px 1fr;
+    grid-template-columns: calc(50% - 20px) 40px calc(50% - 20px);
     padding: 24px 0;
     gap: 0;
   }
