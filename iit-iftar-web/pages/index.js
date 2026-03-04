@@ -198,7 +198,7 @@ function FadeInBox({ children, className = '' }) {
     }, []);
 
     return (
-        <div ref={ref} className={`${className} ${styles.fadeInBox} ${isVisible ? styles.visible : ''}`}>
+        <div ref={ref} className={`${className} ${styles.fadeInBox} ${isVisible ? styles.fadeInBoxVisible : ''}`}>
             {children}
         </div>
     );
