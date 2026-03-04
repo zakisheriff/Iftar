@@ -314,11 +314,16 @@
     position: fixed;
     inset: 0;
     z-index: 1000;
-    background: rgba(8, 14, 10, 0.97);
+    background: #080e0a;
+    /* completely solid to prevent background bleed during zoom */
     display: flex;
     flex-direction: column;
     animation: lbIn 0.2s ease;
     overscroll-behavior: none;
+    transform: translateZ(0);
+    /* hardware acceleration for smooth native zoom */
+    box-shadow: 0 0 0 100vmax #080e0a;
+    /* prevents white edges when bouncing on iOS Safari */
 }
 
 @keyframes lbIn {
@@ -419,10 +424,12 @@
 
 .lbArrow {
     flex-shrink: 0;
-    width: 60px;
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.5);
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: #fff;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -431,8 +438,8 @@
 }
 
 .lbArrow:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.05);
 }
 
 .lbImgWrap {
@@ -493,11 +500,23 @@
 .lbBottom {
     flex-shrink: 0;
     width: 100%;
-    text-align: center;
-    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 16px 20px;
+    background: rgba(8, 14, 10, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    box-sizing: border-box;
+}
+
+.lbCounter {
     font-size: 13px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.5);
+    min-width: 60px;
+    text-align: center;
+    letter-spacing: 1px;
 }
 
 /* ── MOBILE RESPONSIVENESS ── */
@@ -506,35 +525,14 @@
         position: relative;
     }
 
-    .lbArrow {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 60px;
-        z-index: 10;
-        background: transparent;
-        /* or a subtle linear gradient to separate from image */
-    }
-
-    /* Assume the first arrow is prev and second is next */
-    .lbArrow:has(svg) {
-        position: absolute;
-    }
-
-    .lbArrow:nth-of-type(1) {
-        left: 0;
-        /* slightly gradient to show arrow on light images */
-        background: linear-gradient(to right, rgba(0, 0, 0, 0.4), transparent);
-    }
-
-    .lbArrow:nth-of-type(2) {
-        right: 0;
-        background: linear-gradient(to left, rgba(0, 0, 0, 0.4), transparent);
-    }
-
     .lbImgWrap {
         padding: 0;
         width: 100%;
         margin: 0;
+    }
+
+    .lbBottom {
+        padding: 12px 20px;
+        gap: 20px;
     }
 }

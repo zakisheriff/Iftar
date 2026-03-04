@@ -320,14 +320,8 @@ export default function Gallery({ year, staticImages }) {
                         </div>
                     </div>
 
-                    {/* MIDDLE: prev arrow + image + next arrow */}
+                    {/* MIDDLE: image */}
                     <div className={styles.lbCenter} onClick={(e) => e.stopPropagation()}>
-                        <button className={styles.lbArrow} onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M15 18l-6-6 6-6" />
-                            </svg>
-                        </button>
-
                         <div className={styles.lbImgWrap}>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
@@ -346,17 +340,23 @@ export default function Gallery({ year, staticImages }) {
                                 onLoad={(e) => e.target.classList.add(styles.lbImageLoaded)}
                             />
                         </div>
+                    </div>
 
+                    {/* BOTTOM: controls & counter */}
+                    <div className={styles.lbBottom}>
+                        <button className={styles.lbArrow} onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M15 18l-6-6 6-6" />
+                            </svg>
+                        </button>
+                        <div className={styles.lbCounter}>
+                            {lightboxIndex + 1} / {photos.length}
+                        </div>
                         <button className={styles.lbArrow} onClick={(e) => { e.stopPropagation(); next(); }} aria-label="Next">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M9 18l6-6-6-6" />
                             </svg>
                         </button>
-                    </div>
-
-                    {/* BOTTOM: counter */}
-                    <div className={styles.lbBottom}>
-                        {lightboxIndex + 1} / {photos.length}
                     </div>
 
                 </div>
