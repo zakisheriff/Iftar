@@ -60,12 +60,12 @@ EMAIL_DELAY = 1.0
 
 # ─── CSV COLUMN NAMES (must match your Sheet header exactly) ───────────────────
 COL_EMAIL       = "Email Address"
-COL_NAME        = "Full Name"
-COL_IITID       = "IIT ID"
-COL_TOKEN       = "Token"
+COL_FNAME       = "First Name"
+COL_LNAME       = "Last Name"
+COL_IITID       = "IIT Student ID"
 COL_FOOD        = "Food Preference"
-COL_PHOTOBOOTH  = "Since we have limited the number of slots for the photobooth this time, please confirm whether you would like to have a photobooth picture?"
-COL_360         = "Would you like to try a 360° camera experience?"
+COL_PHOTOBOOTH  = "As part of the event, a photo-booth will be set up. As slots are limited, kindly indicate below if you intend to take a picture"
+COL_360         = "Would you like to try a 360° Camera Experience?  "
 COL_EMAIL_SENT  = "Email Sent"   # added by this script to output CSV only
 
 # ─── LOGGING ───────────────────────────────────────────────────────────────────
@@ -558,8 +558,9 @@ def main(dry_run: bool, resume: bool):
         log.info("\nDRY RUN — no emails will be sent. Preview:\n")
         for _, row in df.iterrows():
             iit_id = str(row.get(COL_IITID, "N/A")).strip()
-            token = str(row.get(COL_TOKEN, "N/A")).strip()
-            log.info(f"  → {row[COL_NAME]} <{row[COL_EMAIL]}>  IIT ID={iit_id}  TOKEN={token}")
+            fname = str(row.get(COL_FNAME, "")).strip()
+            lname = str(row.get(COL_LNAME, "")).strip()
+            log.info(f"  → {fname} {lname} <{row[COL_EMAIL]}>  IIT ID={iit_id}")
         return
 
     log.info("Authenticating with Gmail API…")
@@ -573,9 +574,10 @@ def main(dry_run: bool, resume: bool):
     with open(SENT_LOG, "a") as log_file:
         for idx, row in df.iterrows():
             email        = str(row[COL_EMAIL]).strip()
-            name         = str(row[COL_NAME]).strip()
+            fname        = str(row.get(COL_FNAME, "")).strip()
+            lname        = str(row.get(COL_LNAME, "")).strip()
+            name         = f"{fname} {lname}".strip()
             iit_id       = str(row.get(COL_IITID, "")).strip()
-            token        = str(row.get(COL_TOKEN, "")).strip()
             food         = str(row[COL_FOOD]).strip()         if COL_FOOD       in df.columns else ""
             photo        = str(row[COL_PHOTOBOOTH]).strip()   if COL_PHOTOBOOTH in df.columns else ""
             cam360       = str(row[COL_360]).strip()          if COL_360        in df.columns else ""
@@ -589,20 +591,20 @@ def main(dry_run: bool, resume: bool):
                 log.warning(f"[{idx+1}/{total}] Missing email, skipping")
                 continue
 
-            if not token:
-                log.warning(f"[{idx+1}/{total}] {name} has no Token — skipping (ensure sheet has Token column)")
+            if not iit_id:
+                log.warning(f"[{idx+1}/{total}] {name} has no IIT ID — skipping")
                 continue
 
-            log.info(f"[{idx+1}/{total}] Sending → {name} <{email}>  (IIT ID: {iit_id}, Token: {token})")
-            success = send_email(service, email, name, iit_id, token, food, photo, cam360)
+            log.info(f"[{idx+1}/{total}] Sending → {name} <{email}>  (IIT ID: {iit_id})")
+            success = send_email(service, email, name, iit_id, iit_id, food, photo, cam360)
 
             if success:
                 df.at[idx, COL_EMAIL_SENT] = "Yes"
-                log_file.write(f"SENT  {email}  token={token}\n")
+                log_file.write(f"SENT  {email}  iitId={iit_id}\n")
                 sent_count += 1
                 log.info(f"  ✓ Sent!")
             else:
-                log_file.write(f"FAIL  {email}  token={token}\n")
+                log_file.write(f"FAIL  {email}  iitId={iit_id}\n")
                 fail_count += 1
 
             df.to_csv(OUTPUT_CSV, index=False)

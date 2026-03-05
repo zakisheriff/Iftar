@@ -6,28 +6,30 @@
 // ── CONFIG ──────────────────────────────────────────────────
 var SHEET_NAME = "Responses";   // default Google Sheets tab name
 
-//  Col indices (1-based) — matches your Google Form output
+//  Column indices (1-based) — matches your Google Form output
 //  Col  1: Timestamp
-//  Col  2: Email Address     ← auto-verified Google email
-//  Col  3: Full Name
-//  Col  4: IIT ID            ← NO LONGER the QR payload
-//  Col  5: Contact Number
-//  Col  6: NIC
-//  Col  7: Food Preference
-//  Col  8: Photobooth
-//  Col  9: Gender
-//  Col 10: 360° Camera
-//  Col 11: Academic level
-//  Col 12: TOKEN             ← this IS the QR payload now
-//  Col 13: Attended          ← written by scanner
-//  Col 14: Attended At       ← written by scanner
+//  Col  2: Email Address
+//  Col  3: First Name
+//  Col  4: Last Name
+//  Col  5: Gender
+//  Col  6: IIT Student ID
+//  Col  7: Contact Number
+//  Col  8: National Identity Card (NIC) / Passport Number
+//  Col  9: Academic Level
+//  Col 10: Food Preference
+//  Col 11: Photo-booth Preference
+//  Col 12: 360° Camera Experience
+//  Col 13: Token
+//  Col 14: Attended          ← written by scanner
+//  Col 15: Attended At       ← written by scanner
 
 var COL_EMAIL        = 2;
-var COL_NAME         = 3;
-var COL_IITID        = 4;
-var COL_TOKEN        = 12;
-var COL_ATTENDED     = 13;
-var COL_ATTENDED_AT  = 14;
+var COL_FNAME        = 3;
+var COL_LNAME        = 4;
+var COL_IITID        = 6;
+var COL_TOKEN        = 13;
+var COL_ATTENDED     = 14;
+var COL_ATTENDED_AT  = 15;
 
 var EVENT_NAME  = "IIT Iftar 2026";
 var EVENT_DATE  = "09 March 2026";
@@ -56,17 +58,17 @@ function doGet(e) {
 
     // ACTION: Manual mark (same as QR scan, just labelled separately)
     if (action === "manualMark") {
-      var token = e.parameter.token;
-      if (!token) return buildResponse({ status: "invalid", message: "No Token provided." });
-      return buildResponse(validateAndMark(sheet, token));
+      var iitId = e.parameter.token; // 'token' parameter from scanner now contains IIT ID
+      if (!iitId) return buildResponse({ status: "invalid", message: "No IIT ID provided." });
+      return buildResponse(validateAndMark(sheet, iitId));
     }
 
-    // DEFAULT ACTION: QR scan — token is the payload
-    var token = e.parameter.token;
-    if (!token) {
-      return buildResponse({ status: "invalid", message: "No Token in QR code." });
+    // DEFAULT ACTION: QR scan — IIT ID is the payload
+    var iitId = e.parameter.token;
+    if (!iitId) {
+      return buildResponse({ status: "invalid", message: "No IIT ID in QR code." });
     }
-    return buildResponse(validateAndMark(sheet, token));
+    return buildResponse(validateAndMark(sheet, iitId));
 
   } catch (err) {
     return buildResponse({ status: "error", message: err.message });
@@ -74,47 +76,37 @@ function doGet(e) {
 }
 
 
-/** Automatically generates a token for new submissions */
+/** Automatically generates a token for new submissions (DISABLED: now using IIT ID) */
 function onFormSubmit(e) {
-  var ss    = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(SHEET_NAME);
-  var row   = e.range.getRow();
-
-  // Generate 8-char random alphanumeric token
-  var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // readable chars
-  var token = "";
-  for (var i = 0; i < 8; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-
-  // Write token to COL_TOKEN
-  sheet.getRange(row, COL_TOKEN).setValue(token);
+  // Token generation removed as we are now using IIT ID for QR codes.
 }
 
 
-/** Finds a row by Token (col 12) and marks attendance */
-function validateAndMark(sheet, token) {
+/** Finds a row by IIT ID (col 5) and marks attendance */
+function validateAndMark(sheet, iitId) {
   var data = sheet.getDataRange().getValues();
 
   for (var i = 1; i < data.length; i++) {
-    var rowToken = String(data[i][COL_TOKEN - 1]).trim();
+    var rowIitId = String(data[i][COL_IITID - 1]).trim();
     var attended = String(data[i][COL_ATTENDED - 1]).trim();
-    var name     = String(data[i][COL_NAME - 1]).trim();
+    var fname    = String(data[i][COL_FNAME - 1]).trim();
+    var lname    = String(data[i][COL_LNAME - 1]).trim();
+    var fullName = (fname + " " + lname).trim();
     var iitId    = String(data[i][COL_IITID - 1]).trim();
 
-    if (rowToken === String(token).trim()) {
+    if (rowIitId.toLowerCase() === String(iitId).trim().toLowerCase()) {
       if (attended === "Yes") {
-        return { status: "already_used", name: name, iit_id: iitId };
+        return { status: "already_used", name: fullName, iit_id: rowIitId };
       }
       var rowNum = i + 1;
       sheet.getRange(rowNum, COL_ATTENDED).setValue("Yes");
       sheet.getRange(rowNum, COL_ATTENDED_AT).setValue(
         Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm:ss")
       );
-      return { status: "success", name: name, iit_id: iitId };
+      return { status: "success", name: fullName, iit_id: rowIitId };
     }
   }
-  return { status: "invalid", message: "Token not found in registrations." };
+  return { status: "invalid", message: "IIT ID not found in registrations." };
 }
 
 
@@ -123,13 +115,17 @@ function getFullList(sheet) {
   var data = sheet.getDataRange().getValues();
   var results = [];
   for (var i = 1; i < data.length; i++) {
-    var name  = String(data[i][COL_NAME - 1]).trim();
+    var fname = String(data[i][COL_FNAME - 1]).trim();
+    var lname = String(data[i][COL_LNAME - 1]).trim();
+    var name  = (fname + " " + lname).trim();
     var email = String(data[i][COL_EMAIL - 1]).trim();
+    
     if (!name && !email) continue;
+    
     results.push({
       name:     name,
       email:    email,
-      token:    String(data[i][COL_TOKEN - 1]).trim(),
+      token:    String(data[i][COL_IITID - 1]).trim(), // Using IIT ID as the token field for backward compatibility in scanner
       iit_id:   String(data[i][COL_IITID - 1]).trim(),
       attended: String(data[i][COL_ATTENDED - 1]).trim() === "Yes"
     });

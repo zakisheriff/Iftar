@@ -1242,7 +1242,7 @@
                         addLog("used", data.name || "Unknown", data.iit_id || "", "Duplicate scan");
                         stats.total++; stats.dup++;
                     } else {
-                        showResult("invalid", "invalid", "Invalid QR Code", "Token not recognised", "");
+                        showResult("invalid", "invalid", "Invalid QR Code", "IIT ID not recognised", "");
                         addLog("invalid", "Unknown", "", "Invalid QR");
                         stats.total++; stats.dup++;
                     }
@@ -1433,14 +1433,14 @@
 
         function manualMark(token, name) {
             if (!token) {
-                alert('No Token found for this student.');
+                alert('No IIT ID found for this student.');
                 return;
             }
             _pendingToken = token;
             _pendingName = name;
 
             document.getElementById('confirmName').textContent = name || 'Unknown';
-            document.getElementById('confirmIitId').textContent = 'Token: ' + token;
+            document.getElementById('confirmIitId').textContent = 'IIT ID: ' + token;
             document.getElementById('confirmOverlay').classList.add('show');
         }
 
