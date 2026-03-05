@@ -56,6 +56,17 @@ function doGet(e) {
       return buildResponse({ status: "success", data: getFullList(sheet) });
     }
 
+    // ACTION: Diagnostic — check column structure
+    if (action === "checkStructure") {
+      var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      return buildResponse({
+        status: "success",
+        expected_iitid_col: COL_IITID,
+        actual_headers: headers,
+        sample_row_1: sheet.getRange(2, 1, 1, sheet.getLastColumn()).getValues()[0]
+      });
+    }
+
     // ACTION: Manual mark (same as QR scan, just labelled separately)
     if (action === "manualMark") {
       var iitId = e.parameter.token; // 'token' parameter from scanner now contains IIT ID
@@ -88,13 +99,17 @@ function validateAndMark(sheet, iitId) {
 
   for (var i = 1; i < data.length; i++) {
     var rowIitId = String(data[i][COL_IITID - 1]).trim();
-    var attended = String(data[i][COL_ATTENDED - 1]).trim();
-    var fname    = String(data[i][COL_FNAME - 1]).trim();
-    var lname    = String(data[i][COL_LNAME - 1]).trim();
-    var fullName = (fname + " " + lname).trim();
-    var iitId    = String(data[i][COL_IITID - 1]).trim();
+    var searchId = String(iitId).trim();
 
-    if (rowIitId.toLowerCase() === String(iitId).trim().toLowerCase()) {
+    // Debug log (view in Apps Script → Executions)
+    // console.log("Checking Row " + (i+1) + ": '" + rowIitId + "' vs '" + searchId + "'");
+
+    if (searchId && rowIitId.toLowerCase() === searchId.toLowerCase()) {
+      var attended = String(data[i][COL_ATTENDED - 1]).trim();
+      var fname    = String(data[i][COL_FNAME - 1]).trim();
+      var lname    = String(data[i][COL_LNAME - 1]).trim();
+      var fullName = (fname + " " + lname).trim();
+
       if (attended === "Yes") {
         return { status: "already_used", name: fullName, iit_id: rowIitId };
       }
