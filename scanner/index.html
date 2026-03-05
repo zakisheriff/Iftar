@@ -1223,11 +1223,11 @@
         // ================================================================
         //  TOKEN VALIDATION
         // ================================================================
-        function validateToken(iitId) {
+        function validateToken(token) {
             // Show loading spinner over the scanner immediately
             loadingOverlay.classList.add("show");
 
-            fetch(APPS_SCRIPT_URL + "?iit_id=" + encodeURIComponent(iitId))
+            fetch(APPS_SCRIPT_URL + "?token=" + encodeURIComponent(token))
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     loadingOverlay.classList.remove("show");
@@ -1406,7 +1406,7 @@
                 var statusText = s.attended ? 'Admitted' : 'Pending';
 
                 var markBtn = s.attended ? '' :
-                    '<button class="mark-btn" data-iit-id="' + escapeHtml(s.iit_id || '') + '" data-name="' + escapeHtml(s.name || '') + '" onclick="manualMark(this.getAttribute(\'data-iit-id\'),this.getAttribute(\'data-name\'))">Mark Attended</button>';
+                    '<button class="mark-btn" data-token="' + escapeHtml(s.token || '') + '" data-name="' + escapeHtml(s.name || '') + '" onclick="manualMark(this.getAttribute(\'data-token\'),this.getAttribute(\'data-name\'))">Mark Attended</button>';
 
                 return '<div class="student-item">' +
                     '<div class="student-status-dot ' + (s.attended ? 'status-admitted' : 'status-pending') + '"></div>' +
@@ -1428,40 +1428,40 @@
         // ================================================================
         //  MANUAL MARK — uses custom modal instead of browser confirm()
         // ================================================================
-        var _pendingIitId = null;
+        var _pendingToken = null;
         var _pendingName = null;
 
-        function manualMark(iitId, name) {
-            if (!iitId) {
-                alert('No IIT ID found for this student.');
+        function manualMark(token, name) {
+            if (!token) {
+                alert('No Token found for this student.');
                 return;
             }
-            _pendingIitId = iitId;
+            _pendingToken = token;
             _pendingName = name;
 
             document.getElementById('confirmName').textContent = name || 'Unknown';
-            document.getElementById('confirmIitId').textContent = 'IIT ID: ' + iitId;
+            document.getElementById('confirmIitId').textContent = 'Token: ' + token;
             document.getElementById('confirmOverlay').classList.add('show');
         }
 
         function closeConfirm() {
             document.getElementById('confirmOverlay').classList.remove('show');
-            _pendingIitId = null;
+            _pendingToken = null;
             _pendingName = null;
         }
 
         function doManualMark() {
-            var iitId = _pendingIitId;
+            var token = _pendingToken;
             var name = _pendingName;
             closeConfirm();
 
-            if (!iitId) return;
+            if (!token) return;
 
             // Show loading spinner (same as QR scan)
             loadingOverlay.classList.add("show");
 
             var separator = APPS_SCRIPT_URL.indexOf('?') !== -1 ? '&' : '?';
-            var url = APPS_SCRIPT_URL + separator + 'action=manualMark&iit_id=' + encodeURIComponent(iitId);
+            var url = APPS_SCRIPT_URL + separator + 'action=manualMark&token=' + encodeURIComponent(token);
 
             fetch(url)
                 .then(function (r) { return r.json(); })

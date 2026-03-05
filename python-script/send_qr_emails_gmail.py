@@ -32,12 +32,14 @@ from email.mime.image import MIMEImage
 import qrcode
 import pandas as pd
 
-import boto3
-from botocore.exceptions import ClientError
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
 
 # ─── CONFIG ────────────────────────────────────────────────────────────────────
 
-SENDER_EMAIL  = "iftar@mail.theoneatom.com" 
+SENDER_EMAIL  = "abdul.20232105@iit.ac.lk"
 SENDER_NAME   = "IIT Iftar Committee"
 
 EVENT_NAME    = "IIT Iftar 2026"
@@ -50,9 +52,11 @@ OUTPUT_CSV    = "responses_sent.csv"   # tracks Email Sent column
 QR_DIR        = "qr_codes"
 SENT_LOG      = "sent_log.txt"
 
-AWS_REGION = "ap-south-1"  # MUST match your SES region
+CREDENTIALS_FILE = "credentials.json"
+TOKEN_FILE       = "token.json"
+SCOPES           = ["https://www.googleapis.com/auth/gmail.send"]
 
-EMAIL_DELAY = 1.0  # Optional delay, SES is fast so could be smaller (e.g., 0.1)
+EMAIL_DELAY = 1.0
 
 # ─── CSV COLUMN NAMES (must match your Sheet header exactly) ───────────────────
 COL_EMAIL       = "Email Address"
@@ -79,20 +83,25 @@ log = logging.getLogger(__name__)
 os.makedirs(QR_DIR, exist_ok=True)
 
 
-# ─── AMAZON SES AUTH ───────────────────────────────────────────────────────────
+# ─── GMAIL API AUTH ────────────────────────────────────────────────────────────
 
-def get_ses_client():
-    # Make sure you have AWS credentials configured.
-    # You can set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY as environment variables,
-    # or run `aws configure` via terminal.
-    try:
-        client = boto3.client('ses', region_name=AWS_REGION)
-        client.get_send_statistics() # Test connection quickly
-        log.info(f"Connected to Amazon SES in {AWS_REGION}")
-        return client
-    except Exception as e:
-        log.error(f"Failed to connect to Amazon SES. Check your AWS credentials! Error: {e}")
+def get_gmail_service():
+    creds = None
+    if not os.path.exists(CREDENTIALS_FILE):
+        log.error(f"'{CREDENTIALS_FILE}' not found! See setup instructions.")
         raise SystemExit(1)
+    if os.path.exists(TOKEN_FILE):
+        creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open(TOKEN_FILE, "w") as f:
+            f.write(creds.to_json())
+        log.info("Authenticated! token.json saved.")
+    return build("gmail", "v1", credentials=creds)
 
 
 # ─── QR CODE (encodes Token directly) ────────────────────────────────────────
@@ -515,25 +524,16 @@ def build_email(to_email: str, name: str, iit_id: str, token: str,
     return msg
 
 
-# ─── SEND VIA AMAZON SES ───────────────────────────────────────────────────────
+# ─── SEND VIA GMAIL API ────────────────────────────────────────────────────────
 
 
-def send_email(ses_client, to_email: str, name: str, iit_id: str, token: str,
+def send_email(service, to_email: str, name: str, iit_id: str, token: str,
                food: str, photobooth: str, camera360: str) -> bool:
     try:
         msg = build_email(to_email, name, iit_id, token, food, photobooth, camera360)
-        
-        response = ses_client.send_raw_email(
-            Source=SENDER_EMAIL,
-            Destinations=[to_email],
-            RawMessage={
-                'Data': msg.as_string()
-            }
-        )
+        raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+        service.users().messages().send(userId="me", body={"raw": raw}).execute()
         return True
-    except ClientError as e:
-        log.error(f"  ✗ Failed for {to_email}: {e.response['Error']['Message']}")
-        return False
     except Exception as e:
         log.error(f"  ✗ Failed for {to_email}: {e}")
         return False
@@ -562,8 +562,8 @@ def main(dry_run: bool, resume: bool):
             log.info(f"  → {row[COL_NAME]} <{row[COL_EMAIL]}>  IIT ID={iit_id}  TOKEN={token}")
         return
 
-    log.info("Connecting to Amazon SES…")
-    service = get_ses_client()
+    log.info("Authenticating with Gmail API…")
+    service = get_gmail_service()
     log.info(f"Ready! Sending from: {SENDER_EMAIL}\n")
 
     sent_count = 0
