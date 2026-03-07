@@ -33,7 +33,15 @@ export default function Home() {
       const res = await fetch('/api/list');
       const data = await res.json();
       if (data.status === 'success') {
-        setStudents(data.data);
+        // Deduplicate by iit_id + email to prevent "doubling"
+        const seen = new Set();
+        const unique = data.data.filter((s: Student) => {
+          const key = (s.iit_id + '|' + s.email).toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        setStudents(unique);
       }
     } catch (e) {
       console.error(e);
@@ -229,13 +237,16 @@ export default function Home() {
   const pending = total - ok;
 
   const filteredStudents = students.filter(s => {
-    const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.email.toLowerCase().includes(search.toLowerCase()) ||
-      s.iit_id.toLowerCase().includes(search.toLowerCase());
+    const sTerm = search.toLowerCase().trim();
+    const matchesSearch = !sTerm ||
+      s.name.toLowerCase().includes(sTerm) ||
+      s.email.toLowerCase().includes(sTerm) ||
+      s.iit_id.toLowerCase().includes(sTerm);
 
+    // Use !! (truthiness) because SQLite returns 0/1 for booleans
     const matchesFilter = filter === 'all' ? true :
-      filter === 'success' ? s.attended === true :
-        s.attended === false;
+      filter === 'success' ? !!s.attended :
+        !s.attended;
 
     return matchesSearch && matchesFilter;
   });
@@ -399,7 +410,7 @@ export default function Home() {
             <div className="list-empty">{students.length === 0 ? 'Syncing...' : 'No matches found.'}</div>
           ) : (
             filteredStudents.map(s => (
-              <div className="student-item" key={s.iit_id}>
+              <div className="student-item" key={s.iit_id + s.email}>
                 <div className={`student-status-dot ${s.attended ? 'status-admitted' : 'status-pending'}`}></div>
                 <div className="student-info">
                   <div className="student-name">{s.name}</div>
