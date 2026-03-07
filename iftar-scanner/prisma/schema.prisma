@@ -10,7 +10,7 @@ datasource db {
 
 model Student {
   id             String    @id @default(cuid())
-  iitId          String    @unique
+  iitId          String
   firstName      String
   lastName       String
   email          String
