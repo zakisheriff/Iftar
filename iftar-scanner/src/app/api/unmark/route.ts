@@ -9,9 +9,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ status: "invalid", message: "No IIT ID provided." });
         }
 
-        const student = await prisma.student.findUnique({
+        const student = await prisma.student.findFirst({
             where: { iitId: token.trim() },
-            select: { iitId: true, firstName: true, lastName: true, attended: true }
+            select: { id: true, iitId: true, firstName: true, lastName: true, attended: true }
         });
 
         if (!student) {
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
         // Mark as not attended
         const updated = await prisma.student.update({
-            where: { iitId: token.trim() },
+            where: { id: student.id },
             data: {
                 attended: false,
                 attendedAt: null,
