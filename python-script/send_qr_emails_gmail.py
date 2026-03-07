@@ -23,6 +23,7 @@ import os
 import argparse
 import base64
 import time
+import random
 import logging
 from io import BytesIO
 from email.mime.multipart import MIMEMultipart
@@ -158,13 +159,13 @@ def build_email(to_email: str, name: str, iit_id: str, token: str,
   .email-outer {{
     background:#0b1512 !important;
     padding:32px 16px;
-    border-radius:28px;
+    border-radius:35px;
   }}
   .wrapper {{
     max-width:560px;
     margin:0 auto;
     background:#0f1e17 !important;
-    border-radius:28px;
+    border-radius:35px;
     overflow:hidden;
     border:1px solid rgba(197,163,88,0.25);
     box-shadow:0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(197,163,88,0.08);
@@ -208,7 +209,7 @@ def build_email(to_email: str, name: str, iit_id: str, token: str,
   }}
   .logo-wrap {{
     width:80px; height:80px;
-    border-radius:50%;
+    border-radius:35px;
     background:rgba(197,163,88,0.08);
     border:1px solid rgba(197,163,88,0.25);
     display:flex;
@@ -273,7 +274,7 @@ def build_email(to_email: str, name: str, iit_id: str, token: str,
     display:inline-block;
     background:rgba(197,163,88,0.1);
     border:1px solid rgba(197,163,88,0.2);
-    border-radius:50px;
+    border-radius:35px;
     padding:4px 14px;
     font-size:12px;
     color:rgba(197,163,88,0.75);
@@ -312,7 +313,7 @@ def build_email(to_email: str, name: str, iit_id: str, token: str,
   /* ── QR CARD ── */
   .qr-card {{
     background:linear-gradient(145deg,#ffffff 0%,#f8f4ee 100%);
-    border-radius:20px;
+    border-radius:35px;
     padding:24px;
     display:inline-block;
     box-shadow:0 0 0 1px rgba(197,163,88,0.3), 0 8px 32px rgba(0,0,0,0.4), 0 0 60px rgba(197,163,88,0.06);
@@ -323,13 +324,13 @@ def build_email(to_email: str, name: str, iit_id: str, token: str,
     content:'';
     position:absolute;
     inset:-1px;
-    border-radius:21px;
+    border-radius:35px;
     background:linear-gradient(135deg,rgba(197,163,88,0.4),transparent 50%,rgba(197,163,88,0.2));
     z-index:-1;
   }}
   .qr-card img {{
     display:block;
-    border-radius:8px;
+    border-radius:35px;
   }}
   .qr-label {{
     font-size:11px;
@@ -344,7 +345,7 @@ def build_email(to_email: str, name: str, iit_id: str, token: str,
     background:rgba(197,163,88,0.05);
     border:1px solid rgba(197,163,88,0.15);
     border-left:3px solid rgba(197,163,88,0.5);
-    border-radius:12px;
+    border-radius:35px;
     padding:16px 20px;
     text-align:left;
     margin-bottom:28px;
@@ -365,7 +366,7 @@ def build_email(to_email: str, name: str, iit_id: str, token: str,
   .event-box {{
     background:rgba(255,255,255,0.03);
     border:1px solid rgba(197,163,88,0.12);
-    border-radius:16px;
+    border-radius:35px;
     padding:24px 16px;
     margin-bottom:8px;
     display:flex;
@@ -415,7 +416,7 @@ def build_email(to_email: str, name: str, iit_id: str, token: str,
   .chip {{
     background:rgba(197,163,88,0.08);
     border:1px solid rgba(197,163,88,0.18);
-    border-radius:50px;
+    border-radius:35px;
     padding:5px 14px;
     font-size:11px;
     color:rgba(197,163,88,0.7);
@@ -439,20 +440,19 @@ def build_email(to_email: str, name: str, iit_id: str, token: str,
 <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#0b1512" style="background-color:#0b1512 !important;">
 <tr><td align="center" bgcolor="#0b1512" style="background-color:#0b1512 !important;padding:32px 16px;">
 <!-- Card with true rounded corners — only div clips child overflow -->
-<div style="max-width:560px;margin:0 auto;background-color:#0f1e17 !important;border-radius:28px;overflow:hidden;border:1px solid rgba(197,163,88,0.25);box-shadow:0 24px 80px rgba(0,0,0,0.6);">
+<div style="max-width:560px;margin:0 auto;background-color:#0f1e17 !important;border-radius:35px;overflow:hidden;border:1px solid rgba(197,163,88,0.25);box-shadow:0 24px 80px rgba(0,0,0,0.6);">
 
   <!-- HEADER -->
   <div style="background-color:#0a1a10 !important;padding:36px 24px 28px;text-align:center;border-bottom:1px solid rgba(197,163,88,0.2);">
     <img src="https://drive.google.com/uc?export=view&id=1yZOAcZWugkGxNs8fV2uzhgXQrW4XWgym" width="100" alt="IIT Iftar Logo" style="display:block;margin:0 auto;">
     <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:700;color:#c5a358 !important;margin:18px 0 6px;letter-spacing:0.3px;">Echoes of Arabia &mdash; Your Entry Pass</div>
-    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:14px;color:rgba(197,163,88,0.6) !important;margin:0;">Some stories never fade; they just echo.</div>
   </div>
 
   <!-- BODY -->
   <div style="background-color:#0f1e17 !important;padding:40px 36px;text-align:center;">
     <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:rgba(197,163,88,0.6) !important;margin:0 0 8px;">As-salamu Alaikum,</div>
     <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:34px;font-weight:700;color:#f0e6c8 !important;margin:0 0 6px;line-height:1.1;">{name}</div>
-    <div style="display:inline-block;background-color:rgba(197,163,88,0.1) !important;border:1px solid rgba(197,163,88,0.2);border-radius:50px;padding:4px 14px;font-size:12px;color:rgba(197,163,88,0.75) !important;letter-spacing:1.5px;margin-bottom:28px;">&#9670; &nbsp;IIT ID &nbsp;{iit_id}&nbsp; &#9670;</div>
+    <div style="display:inline-block;background-color:rgba(197,163,88,0.1) !important;border:1px solid rgba(197,163,88,0.2);border-radius:35px;padding:4px 14px;font-size:12px;color:rgba(197,163,88,0.75) !important;letter-spacing:1.5px;margin-bottom:28px;">&#9670; &nbsp;IIT ID &nbsp;{iit_id}&nbsp; &#9670;</div>
 
     <div style="display:flex;align-items:center;gap:12px;margin:0 0 28px;">
       <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(197,163,88,0.25));"></div>
@@ -467,40 +467,40 @@ def build_email(to_email: str, name: str, iit_id: str, token: str,
     </div>
 
     <!-- QR CODE -->
-    <div style="display:inline-block;background:linear-gradient(145deg,#ffffff,#f8f4ee);border-radius:20px;padding:24px;box-shadow:0 0 0 1px rgba(197,163,88,0.3),0 8px 32px rgba(0,0,0,0.4);margin-bottom:12px;">
-      <img src="cid:qrcode" width="220" height="220" alt="Entry QR Code" style="display:block;border-radius:8px;">
+    <div style="display:inline-block;background:linear-gradient(145deg,#ffffff,#f8f4ee);border-radius:35px;padding:24px;box-shadow:0 0 0 1px rgba(197,163,88,0.3),0 8px 32px rgba(0,0,0,0.4);margin-bottom:12px;">
+      <img src="cid:qrcode" width="220" height="220" alt="Entry QR Code" style="display:block;border-radius:35px;">
     </div>
     <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(197,163,88,0.45) !important;margin:14px 0 32px;">&#9670; &nbsp; Scan at entrance &nbsp; &#9670;</div>
 
     <!-- WARNING -->
-    <div style="background-color:rgba(197,163,88,0.05) !important;border:1px solid rgba(197,163,88,0.15);border-left:3px solid rgba(197,163,88,0.5);border-radius:12px;padding:16px 20px;text-align:left;margin-bottom:28px;font-size:13px;color:rgba(240,230,200,0.55) !important;line-height:1.7;">
+    <div style="background-color:rgba(197,163,88,0.05) !important;border:1px solid rgba(197,163,88,0.15);border-left:3px solid rgba(197,163,88,0.5);border-radius:35px;padding:16px 20px;text-align:left;margin-bottom:28px;font-size:13px;color:rgba(240,230,200,0.55) !important;line-height:1.7;">
       <strong style="display:block;color:rgba(197,163,88,0.8) !important;font-size:12px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">&#9888; Important</strong>
       Do not share this QR code. It becomes void after the first scan.
       A screenshot on your phone is perfectly fine.
     </div>
 
     <!-- EVENT DETAILS -->
-    <div style="background-color:rgba(255,255,255,0.03) !important;border:1px solid rgba(197,163,88,0.12);border-radius:16px;padding:24px 16px;margin-bottom:8px;display:flex;justify-content:center;">
-      <div style="flex:1;text-align:center;padding:0 12px;border-right:1px solid rgba(197,163,88,0.1);">
-        <div style="font-size:10px;color:rgba(197,163,88,0.5) !important;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px;font-weight:600;">Date</div>
-        <div style="font-size:14px;color:#f0e6c8 !important;font-weight:500;">{EVENT_DATE}</div>
-      </div>
-      <div style="flex:1;text-align:center;padding:0 12px;border-right:1px solid rgba(197,163,88,0.1);">
-        <div style="font-size:10px;color:rgba(197,163,88,0.5) !important;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px;font-weight:600;">Time</div>
-        <div style="font-size:14px;color:#f0e6c8 !important;font-weight:500;">{EVENT_TIME}</div>
-      </div>
-      <div style="flex:1;text-align:center;padding:0 12px;">
-        <div style="font-size:10px;color:rgba(197,163,88,0.5) !important;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px;font-weight:600;">Venue</div>
-        <div style="font-size:14px;font-weight:500;"><a href="https://maps.google.com/?q=Temple+Trees+Colombo+Sri+Lanka" style="color:#f0e6c8 !important;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(197,163,88,0.35);" target="_blank">{EVENT_VENUE}</a></div>
-      </div>
-    </div>
-
-    {chips_block}
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:rgba(255,255,255,0.03) !important;border:1px solid rgba(197,163,88,0.12);border-radius:35px;margin-bottom:8px;">
+      <tr>
+        <td width="33%" align="center" style="padding:24px 12px;border-right:1px solid rgba(197,163,88,0.1);">
+          <div style="font-size:10px;color:rgba(197,163,88,0.5) !important;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px;font-weight:600;">Date</div>
+          <div style="font-size:14px;color:#f0e6c8 !important;font-weight:500;">{EVENT_DATE}</div>
+        </td>
+        <td width="33%" align="center" style="padding:24px 12px;border-right:1px solid rgba(197,163,88,0.1);">
+          <div style="font-size:10px;color:rgba(197,163,88,0.5) !important;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px;font-weight:600;">Time</div>
+          <div style="font-size:14px;color:#f0e6c8 !important;font-weight:500;">{EVENT_TIME}</div>
+        </td>
+        <td width="34%" align="center" style="padding:24px 12px;">
+          <div style="font-size:10px;color:rgba(197,163,88,0.5) !important;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px;font-weight:600;">Venue</div>
+          <div style="font-size:14px;font-weight:500;"><a href="https://maps.google.com/?q=Temple+Trees+Colombo+Sri+Lanka" style="color:#f0e6c8 !important;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(197,163,88,0.35);" target="_blank">{EVENT_VENUE}</a></div>
+        </td>
+      </tr>
+    </table>
   </div>
 
   <!-- FOOTER -->
   <div style="background-color:#0a1410 !important;border-top:1px solid rgba(197,163,88,0.1);padding:20px 32px;text-align:center;font-size:11px;color:rgba(240,230,200,0.25) !important;letter-spacing:0.5px;">
-    IIT IFTAR COMMITTEE &nbsp;&#183;&nbsp; This is an automated message &mdash; please do not reply
+    IIT Iftar Committee &nbsp;&#183;&nbsp; This is an automated message &mdash; please do not reply
   </div>
 
 </div>
@@ -600,15 +600,17 @@ def main(dry_run: bool, resume: bool):
 
             if success:
                 df.at[idx, COL_EMAIL_SENT] = "Yes"
-                log_file.write(f"SENT  {email}  iitId={iit_id}\n")
+                log_file.write(f"SENT  {email}  iit_id={iit_id}\n")
                 sent_count += 1
                 log.info(f"  ✓ Sent!")
             else:
-                log_file.write(f"FAIL  {email}  iitId={iit_id}\n")
+                log_file.write(f"FAIL  {email}  iit_id={iit_id}\n")
                 fail_count += 1
 
             df.to_csv(OUTPUT_CSV, index=False)
-            time.sleep(EMAIL_DELAY)
+            # Randomized delay (1.5s to 3.5s) to avoid bot detection and rate limits
+            wait_time = random.uniform(1.5, 3.5)
+            time.sleep(wait_time)
 
     log.info("─" * 50)
     log.info(f"Done!  ✓ {sent_count} sent   ✗ {fail_count} failed")

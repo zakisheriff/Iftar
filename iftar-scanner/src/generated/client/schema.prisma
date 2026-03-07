@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Student {
+  id             String  @id @default(cuid())
+  iitId          String  @unique
+  firstName      String
+  lastName       String
+  email          String
+  gender         String?
+  contactNumber  String?
+  nicOrPassport  String?
+  academicLevel  String?
+  foodPreference String?
+  photobooth     String?
+  camera360      String?
+
+  attended   Boolean   @default(false)
+  attendedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
