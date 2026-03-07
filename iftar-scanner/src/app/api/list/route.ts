@@ -30,8 +30,8 @@ export async function GET() {
             status: "success",
             data: formatted
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('List Error:', error);
-        return NextResponse.json({ status: "error", message: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ status: "error", message: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }
