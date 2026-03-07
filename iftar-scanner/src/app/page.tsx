@@ -25,6 +25,7 @@ export default function Home() {
   const [filter, setFilter] = useState<'all' | 'success' | 'duplicate'>('all');
   const [search, setSearch] = useState('');
   const [syncing, setSyncing] = useState(false);
+  const [confirming, setConfirming] = useState<{ type: 'mark' | 'unmark', token: string, name: string } | null>(null);
 
   const fetchMasterList = async () => {
     setSyncing(true);
@@ -47,9 +48,13 @@ export default function Home() {
   }, []);
 
   const handleManualMark = async (token: string, name: string) => {
-    if (scanState !== 'idle' || resultData !== null) return;
-    const confirmed = window.confirm(`Are you sure you want to mark ${name} as Admitted?`);
-    if (!confirmed) return;
+    setConfirming({ type: 'mark', token, name });
+  };
+
+  const executeManualMark = async () => {
+    if (!confirming) return;
+    const { token } = confirming;
+    setConfirming(null);
     setScanState('loading');
 
     try {
@@ -101,10 +106,13 @@ export default function Home() {
   };
 
   const handleUnmark = async (token: string, name: string) => {
-    if (scanState !== 'idle' || resultData !== null) return;
-    const confirmed = window.confirm(`Are you sure you want to UNMARK ${name} and set them as Pending?`);
-    if (!confirmed) return;
+    setConfirming({ type: 'unmark', token, name });
+  };
 
+  const executeUnmark = async () => {
+    if (!confirming) return;
+    const { token } = confirming;
+    setConfirming(null);
     setScanState('loading');
 
     try {
@@ -156,7 +164,7 @@ export default function Home() {
   };
 
   const handleScan = async (result: IDetectedBarcode[]) => {
-    if (!result || result.length === 0 || scanState !== 'idle' || resultData !== null) return;
+    if (!result || result.length === 0 || scanState !== 'idle' || resultData !== null || confirming !== null) return;
     const token = result[0].rawValue;
 
     setScanState('loading');
@@ -188,7 +196,7 @@ export default function Home() {
           status: finalStatus,
           name: data.name || 'Unknown',
           iitId: data.iit_id || '',
-          time: finalStatus === 'success' ? 'Admitted' : finalStatus === 'already_used' ? 'Duplicate scan' : 'Invalid QR' + ' · ' + timeStr
+          time: (finalStatus === 'success' ? 'Admitted' : finalStatus === 'already_used' ? 'Duplicate scan' : 'Invalid QR') + ' · ' + timeStr
         }, ...prev];
         return newLogs.slice(0, 50);
       });
@@ -208,6 +216,12 @@ export default function Home() {
       });
       setTimeout(() => { setResultData(null); setScanState('idle'); }, 2500);
     }
+  };
+
+  const forceReset = () => {
+    setScanState('idle');
+    setResultData(null);
+    setConfirming(null);
   };
 
   const total = students.length;
@@ -245,8 +259,38 @@ export default function Home() {
               styles={{ container: { width: '100%', height: '100%' } }}
               components={{ finder: false }}
               formats={['qr_code']}
+              paused={scanState !== 'idle' || resultData !== null || confirming !== null}
             />
           </div>
+
+          {/* CUSTOM CONFIRMATION OVERLAY */}
+          {confirming && (
+            <div id="confirm-overlay" className="show">
+              <div className="confirm-card">
+                <div className="confirm-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                    <path d="M12 8v4"></path>
+                    <path d="M12 16h.01"></path>
+                  </svg>
+                </div>
+                <div className="confirm-title">
+                  {confirming.type === 'mark' ? 'Confirm Admission' : 'Confirm Unmark'}
+                </div>
+                <div className="confirm-desc">
+                  {confirming.type === 'mark'
+                    ? `Are you sure you want to mark ${confirming.name} as Admitted?`
+                    : `Are you sure you want to set ${confirming.name} back to Pending?`}
+                </div>
+                <div className="confirm-actions">
+                  <button className="confirm-btn-cancel" onClick={() => setConfirming(null)}>Cancel</button>
+                  <button className="confirm-btn-proceed" onClick={confirming.type === 'mark' ? executeManualMark : executeUnmark}>
+                    {confirming.type === 'mark' ? 'Confirm' : 'Unmark'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="scan-frame">
             <div className="frame-box">
@@ -291,7 +335,12 @@ export default function Home() {
 
         <div className="status-bar">
           <div className="status-dot"></div>
-          <span className="status-text">Point camera at student's QR code</span>
+          <span className="status-text">
+            {scanState === 'loading' ? 'Processing...' : resultData ? 'Result Displayed' : confirming ? 'Waiting for Confirmation' : 'Point camera at student\'s QR code'}
+          </span>
+          {(scanState !== 'idle' || resultData !== null || confirming !== null) && (
+            <button className="force-reset-btn" onClick={forceReset}>Resume</button>
+          )}
         </div>
       </div>
 
