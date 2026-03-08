@@ -318,10 +318,12 @@ export default function Home() {
                 <div className="confirm-title">
                   {confirming.type === 'mark' ? 'Confirm Check-in' : 'Confirm Unmark'}
                 </div>
-                <div className="confirm-desc">
-                  {confirming.type === 'mark'
-                    ? <>Are you sure you want to mark <strong>{confirming.name} ({confirming.token})</strong> as Present?</>
-                    : <>Are you sure you want to set <strong>{confirming.name} ({confirming.token})</strong> back to Pending?</>}
+                <div className="confirm-desc" style={{ marginBottom: '30px' }}>
+                  {confirming.type === 'mark' ? 'Mark attendance for' : 'Reset status for'}
+                  <strong style={{ color: 'var(--text)', display: 'block', margin: '12px 0', fontSize: '18px', fontWeight: '800' }}>
+                    {confirming.name} ({confirming.token})
+                  </strong>
+                  {confirming.type === 'mark' ? 'as Present?' : 'back to Pending?'}
                 </div>
                 <div className="confirm-actions">
                   <button className="confirm-btn-cancel" onClick={(e) => { e.stopPropagation(); setConfirming(null); }}>Cancel</button>
