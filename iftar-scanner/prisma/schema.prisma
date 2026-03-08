@@ -10,7 +10,7 @@ datasource db {
 
 model Student {
   id             String    @id @default(cuid())
-  iitId          String
+  iitId          String    @unique
   firstName      String
   lastName       String
   email          String
@@ -27,4 +27,7 @@ model Student {
   
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  @@index([attendedAt])
+  @@index([attended])
 }
