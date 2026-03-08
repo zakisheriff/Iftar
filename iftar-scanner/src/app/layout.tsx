@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: "Iftar '26",
   description: "IIT Iftar '26 Scanner",
+  icons: {
+    icon: '/icon.png',
+  },
 }
 
 export default function RootLayout({
@@ -16,7 +19,6 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-        <link rel="icon" href="/assets/iftar-logo.png" />
       </head>
       <body>
         <div className="bg-orb orb-1"></div>
