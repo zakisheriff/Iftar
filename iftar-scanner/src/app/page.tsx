@@ -271,6 +271,7 @@ export default function Home() {
               components={{ finder: false }}
               formats={['qr_code']}
               paused={scanState !== 'idle' || resultData !== null || confirming !== null}
+              sound={false}
             />
           </div>
 
