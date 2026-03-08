@@ -26,6 +26,7 @@ export default function Home() {
   const [search, setSearch] = useState('');
   const [syncing, setSyncing] = useState(false);
   const [confirming, setConfirming] = useState<{ type: 'mark' | 'unmark', token: string, name: string } | null>(null);
+  const [manualPaused, setManualPaused] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fetchMasterList = async () => {
@@ -78,7 +79,7 @@ export default function Home() {
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
       let finalStatus = data.status;
-      let finalMsg = finalStatus === 'success' ? 'Admitted (Manual)' : finalStatus === 'already_used' ? 'Already Checked In' : 'Invalid ID';
+      let finalMsg = finalStatus === 'success' ? 'Checked In (Manual)' : finalStatus === 'already_used' ? 'Already Checked In' : 'Invalid ID';
 
       setResultData({
         status: finalStatus,
@@ -92,7 +93,7 @@ export default function Home() {
           status: finalStatus,
           name: data.name || 'Unknown',
           iitId: data.iit_id || '',
-          time: (finalStatus === 'success' ? 'Admitted (Manual)' : finalStatus === 'already_used' ? 'Duplicate scan' : 'Invalid ID') + ' · ' + timeStr
+          time: (finalStatus === 'success' ? 'Checked In (Manual)' : finalStatus === 'already_used' ? 'Duplicate scan' : 'Invalid ID') + ' · ' + timeStr
         }, ...prev];
         return newLogs.slice(0, 50);
       });
@@ -190,7 +191,7 @@ export default function Home() {
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
       let finalStatus = data.status;
-      let finalMsg = finalStatus === 'success' ? 'Admitted! Welcome.' : finalStatus === 'already_used' ? 'Already Checked In' : 'Invalid QR Code';
+      let finalMsg = finalStatus === 'success' ? 'Welcome! Checked In.' : finalStatus === 'already_used' ? 'Already Checked In' : 'Invalid QR Code';
 
       setResultData({
         status: finalStatus,
@@ -205,7 +206,7 @@ export default function Home() {
           status: finalStatus,
           name: data.name || 'Unknown',
           iitId: data.iit_id || '',
-          time: (finalStatus === 'success' ? 'Admitted' : finalStatus === 'already_used' ? 'Duplicate scan' : 'Invalid QR') + ' · ' + timeStr
+          time: (finalStatus === 'success' ? 'Checked In' : finalStatus === 'already_used' ? 'Duplicate scan' : 'Invalid QR') + ' · ' + timeStr
         }, ...prev];
         return newLogs.slice(0, 50);
       });
@@ -231,6 +232,7 @@ export default function Home() {
     setScanState('idle');
     setResultData(null);
     setConfirming(null);
+    setManualPaused(false);
   };
 
   const total = students.length;
@@ -259,33 +261,45 @@ export default function Home() {
           <img src="/assets/iftar-logo.png" alt="Iftar 2026 Logo" className="header-logo" />
         </div>
         <p className="tagline">Attendance Management System</p>
-        <p className="theme-desc">Scan QR codes or search to mark admissions.</p>
+        <p className="theme-desc">Scan QR codes or search to mark attendance.</p>
       </header>
 
       {/* CAMERA CARD */}
       <div className="camera-card">
-        <div className="video-wrapper">
+        <div
+          className="video-wrapper"
+          onClick={() => {
+            if (scanState === 'idle' && !resultData && !confirming) {
+              setManualPaused(prev => !prev);
+            }
+          }}
+          style={{ cursor: scanState === 'idle' && !resultData && !confirming ? 'pointer' : 'default' }}
+        >
           <div style={{ position: 'absolute', inset: 0 }}>
             <Scanner
               onScan={handleScan}
               styles={{ container: { width: '100%', height: '100%' } }}
               components={{ finder: false }}
               formats={['qr_code']}
-              paused={scanState !== 'idle' || resultData !== null || confirming !== null}
+              paused={manualPaused || scanState !== 'idle' || resultData !== null || confirming !== null}
               sound={false}
             />
           </div>
 
-          {/* CLICKABLE RESUME OVERLAY - Only shows when result is displayed or confirming */}
-          {(resultData !== null || confirming !== null) && (
-            <button className="resume-overlay" onClick={forceReset} title="Tap to scan again">
+          {/* CLICKABLE RESUME OVERLAY - Only shows when result is displayed, confirming, or manually paused */}
+          {(manualPaused || resultData !== null || confirming !== null) && (
+            <button
+              className="resume-overlay"
+              onClick={(e) => { e.stopPropagation(); forceReset(); }}
+              title="Tap to scan again"
+            >
               <div className="resume-icon">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M23 4v6h-6"></path>
                   <path d="M1 20v-6h6"></path>
                   <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
                 </svg>
-                <span>Tap to Resume Scanning</span>
+                <span>{manualPaused ? 'Camera Paused · Tap to Resume' : 'Tap to Resume Scanning'}</span>
               </div>
             </button>
           )}
@@ -302,12 +316,12 @@ export default function Home() {
                   </svg>
                 </div>
                 <div className="confirm-title">
-                  {confirming.type === 'mark' ? 'Confirm Admission' : 'Confirm Unmark'}
+                  {confirming.type === 'mark' ? 'Confirm Check-in' : 'Confirm Unmark'}
                 </div>
                 <div className="confirm-desc">
                   {confirming.type === 'mark'
-                    ? `Are you sure you want to mark ${confirming.name} as Admitted?`
-                    : `Are you sure you want to set ${confirming.name} back to Pending?`}
+                    ? <>Are you sure you want to mark <strong>{confirming.name} ({confirming.token})</strong> as Present?</>
+                    : <>Are you sure you want to set <strong>{confirming.name} ({confirming.token})</strong> back to Pending?</>}
                 </div>
                 <div className="confirm-actions">
                   <button className="confirm-btn-cancel" onClick={(e) => { e.stopPropagation(); setConfirming(null); }}>Cancel</button>
@@ -368,25 +382,22 @@ export default function Home() {
       </div>
 
       <div className="status-text-only">
-        {scanState === 'loading' ? 'Processing...' : (resultData || confirming) ? 'Tap scanner to resume' : 'Point camera at student\'s QR code'}
+        {scanState === 'loading' ? 'Processing...' : (manualPaused || resultData || confirming) ? 'Tap scanner to resume' : 'Point camera at student\'s QR code'}
       </div>
 
       {/* STATS STRIP */}
       <div className="stats-strip">
         <div className={`stat-card clickable ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>
           <div className="stat-num">{total}</div>
-          <div className="stat-label">Total</div>
-          <div className="stat-label-sub">Registered</div>
+          <div className="stat-label">TOTAL</div>
         </div>
         <div className={`stat-card clickable ${filter === 'success' ? 'active' : ''}`} onClick={() => setFilter('success')}>
           <div className="stat-num ok">{ok}</div>
-          <div className="stat-label">Admitted</div>
-          <div className="stat-label-sub">Checked In</div>
+          <div className="stat-label">PRESENT</div>
         </div>
         <div className={`stat-card clickable ${filter === 'duplicate' ? 'active' : ''}`} onClick={() => setFilter('duplicate')}>
           <div className="stat-num dup">{pending}</div>
-          <div className="stat-label">Pending</div>
-          <div className="stat-label-sub">Remaining</div>
+          <div className="stat-label">PENDING</div>
         </div>
       </div>
 
@@ -446,7 +457,7 @@ export default function Home() {
           ) : (
             filteredStudents.map(s => (
               <div className="student-item" key={s.iit_id + s.email}>
-                <div className={`student-status-dot ${s.attended ? 'status-admitted' : 'status-pending'}`}></div>
+                <div className={`student-status-dot ${s.attended ? 'status-present' : 'status-pending'}`}></div>
                 <div className="student-info">
                   <div className="student-name">{s.name}</div>
                   <div className="student-email">{s.iit_id} · {s.email}</div>

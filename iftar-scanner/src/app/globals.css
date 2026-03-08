@@ -746,7 +746,7 @@ body {
   flex-shrink: 0;
 }
 
-.status-admitted {
+.status-present {
   background: var(--success);
 }
 
