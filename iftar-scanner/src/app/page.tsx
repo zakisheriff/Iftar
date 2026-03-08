@@ -276,8 +276,8 @@ export default function Home() {
             />
           </div>
 
-          {/* CLICKABLE RESUME OVERLAY - Only shows when paused */}
-          {(scanState !== 'idle' || resultData !== null || confirming !== null) && (
+          {/* CLICKABLE RESUME OVERLAY - Only shows when result is displayed or confirming */}
+          {(resultData !== null || confirming !== null) && (
             <button className="resume-overlay" onClick={forceReset} title="Tap to scan again">
               <div className="resume-icon">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -332,7 +332,12 @@ export default function Home() {
             </svg>
           </div>
 
-          <div id="result-overlay" className={`${resultData ? 'show' : ''} ${resultData?.status || ''}`}>
+          <div
+            id="result-overlay"
+            className={`${resultData ? 'show' : ''} ${resultData?.status || ''}`}
+            onClick={forceReset}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="result-icon-wrapper">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                 {resultData?.status === 'success' && <path d="M20 6L9 17l-5-5"></path>}
@@ -361,11 +366,8 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="status-bar-outer">
-        <div className="status-dot"></div>
-        <span className="status-text">
-          {scanState === 'loading' ? 'Processing...' : (resultData || confirming) ? 'Tap scanner to resume' : 'Point camera at student\'s QR code'}
-        </span>
+      <div className="status-text-only">
+        {scanState === 'loading' ? 'Processing...' : (resultData || confirming) ? 'Tap scanner to resume' : 'Point camera at student\'s QR code'}
       </div>
 
       {/* STATS STRIP */}
@@ -406,7 +408,7 @@ export default function Home() {
             <button
               className="search-clear-btn"
               onMouseDown={(e) => e.preventDefault()}
-              onClick={() => { setSearch(''); searchInputRef.current?.focus(); }}
+              onClick={() => { setSearch(''); }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>

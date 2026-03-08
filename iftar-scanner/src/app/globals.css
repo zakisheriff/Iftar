@@ -364,26 +364,16 @@ body {
   }
 }
 
-/* ── STATUS BAR (OUTSIDE) ────────────────────────── */
-.status-bar-outer {
+/* ── STATUS TEXT (SIMPLIFIED) ────────────────────── */
+.status-text-only {
   width: 100%;
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--primary-dim);
-  border-radius: 20px;
-  margin-top: -8px;
-  /* Pull closer to camera card */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.status-text {
+  text-align: center;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--muted);
+  opacity: 0.8;
+  margin-top: -4px;
+  margin-bottom: 4px;
 }
 
 /* ── RESUME OVERLAY ──────────────────────────────── */
