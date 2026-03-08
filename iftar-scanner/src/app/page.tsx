@@ -27,6 +27,7 @@ export default function Home() {
   const [syncing, setSyncing] = useState(false);
   const [confirming, setConfirming] = useState<{ type: 'mark' | 'unmark', token: string, name: string } | null>(null);
   const [manualPaused, setManualPaused] = useState(false);
+  const [stats, setStats] = useState({ total: 0, present: 0 });
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fetchMasterList = async () => {
@@ -44,6 +45,10 @@ export default function Home() {
           return true;
         });
         setStudents(unique);
+        setStats({
+          total: unique.length,
+          present: unique.filter((s: Student) => s.attended).length
+        });
       }
     } catch (e) {
       console.error(e);
@@ -51,9 +56,22 @@ export default function Home() {
     setSyncing(false);
   };
 
+  const fetchStats = async () => {
+    try {
+      const res = await fetch('/api/stats');
+      const data = await res.json();
+      if (data.status === 'success') {
+        setStats({ total: data.total, present: data.present });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     fetchMasterList();
-    const interval = setInterval(fetchMasterList, 30000);
+    fetchStats();
+    const interval = setInterval(fetchStats, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -99,7 +117,9 @@ export default function Home() {
       });
 
       if (finalStatus === 'success') {
-        fetchMasterList();
+        const studentId = data.iit_id;
+        setStudents(prev => prev.map(s => s.iit_id === studentId ? { ...s, attended: true } : s));
+        setStats(prev => ({ ...prev, present: prev.present + 1 }));
       }
 
       setTimeout(() => {
@@ -157,7 +177,9 @@ export default function Home() {
       });
 
       if (finalStatus === 'success') {
-        fetchMasterList();
+        const studentId = data.iit_id;
+        setStudents(prev => prev.map(s => s.iit_id === studentId ? { ...s, attended: false } : s));
+        setStats(prev => ({ ...prev, present: Math.max(0, prev.present - 1) }));
       }
 
       setTimeout(() => {
@@ -212,7 +234,9 @@ export default function Home() {
       });
 
       if (finalStatus === 'success') {
-        fetchMasterList(); // Update the list in background
+        const studentId = data.iit_id;
+        setStudents(prev => prev.map(s => s.iit_id === studentId ? { ...s, attended: true } : s));
+        setStats(prev => ({ ...prev, present: prev.present + 1 }));
       }
 
       setTimeout(() => {
@@ -235,9 +259,9 @@ export default function Home() {
     setManualPaused(false);
   };
 
-  const total = students.length;
-  const ok = students.filter(s => s.attended).length;
-  const pending = total - ok;
+  const totalCount = stats.total || students.length;
+  const okCount = stats.present || students.filter(s => s.attended).length;
+  const pendingCount = totalCount - okCount;
 
   const filteredStudents = students.filter(s => {
     const sTerm = search.toLowerCase().trim();
@@ -261,7 +285,6 @@ export default function Home() {
           <img src="/assets/iftar-logo.png" alt="Iftar 2026 Logo" className="header-logo" />
         </div>
         <p className="tagline">Attendance Management System</p>
-        <p className="theme-desc">Scan QR codes or search to mark attendance.</p>
       </header>
 
       {/* CAMERA CARD */}
@@ -392,16 +415,25 @@ export default function Home() {
 
       {/* STATS STRIP */}
       <div className="stats-strip">
-        <div className={`stat-card clickable ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>
-          <div className="stat-num">{total}</div>
+        <div
+          className={`stat-card clickable ${filter === 'all' ? 'active' : ''}`}
+          onClick={() => setFilter('all')}
+        >
+          <div className="stat-value">{totalCount}</div>
           <div className="stat-label">TOTAL</div>
         </div>
-        <div className={`stat-card clickable ${filter === 'success' ? 'active' : ''}`} onClick={() => setFilter('success')}>
-          <div className="stat-num ok">{ok}</div>
+        <div
+          className={`stat-card clickable ${filter === 'success' ? 'active' : ''}`}
+          onClick={() => setFilter('success')}
+        >
+          <div className="stat-value highlight-success">{okCount}</div>
           <div className="stat-label">PRESENT</div>
         </div>
-        <div className={`stat-card clickable ${filter === 'duplicate' ? 'active' : ''}`} onClick={() => setFilter('duplicate')}>
-          <div className="stat-num dup">{pending}</div>
+        <div
+          className={`stat-card clickable ${filter === 'duplicate' ? 'active' : ''}`}
+          onClick={() => setFilter('duplicate')}
+        >
+          <div className="stat-value highlight-pending">{pendingCount}</div>
           <div className="stat-label">PENDING</div>
         </div>
       </div>
@@ -434,6 +466,18 @@ export default function Home() {
             </button>
           )}
         </div>
+        <button
+          className={`sync-btn-icon ${syncing ? 'syncing' : ''}`}
+          onClick={fetchMasterList}
+          title="Full Refresh Master List"
+          disabled={syncing}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M23 4v6h-6"></path>
+            <path d="M1 20v-6h6"></path>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </button>
       </div>
 
       {/* MASTER LIST */}
@@ -448,13 +492,6 @@ export default function Home() {
             </svg>
             Master Attendance
           </div>
-          <button className={`sync-btn ${syncing ? 'spinning' : ''}`} onClick={fetchMasterList}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M23 4v6h-6"></path>
-              <path d="M1 20v-6h6"></path>
-              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-            </svg>
-          </button>
         </div>
         <div className="student-list">
           {filteredStudents.length === 0 ? (
