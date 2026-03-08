@@ -14,8 +14,7 @@ export async function GET() {
                 attendedAt: true,
             },
             orderBy: [
-                { attendedAt: 'desc' },
-                { firstName: 'asc' }
+                { attendedAt: 'desc' }
             ]
         });
 
@@ -25,6 +24,9 @@ export async function GET() {
             iit_id: s.iitId,
             attended: s.attended,
         }));
+
+        // Case-insensitive alphabetical sort
+        formatted.sort((a: any, b: any) => a.name.localeCompare(b.name, undefined, { sensitivity: 'accent' }));
 
         return NextResponse.json({
             status: "success",

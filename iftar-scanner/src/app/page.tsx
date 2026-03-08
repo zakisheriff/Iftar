@@ -26,6 +26,7 @@ export default function Home() {
   const [search, setSearch] = useState('');
   const [syncing, setSyncing] = useState(false);
   const [confirming, setConfirming] = useState<{ type: 'mark' | 'unmark', token: string, name: string } | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fetchMasterList = async () => {
     setSyncing(true);
@@ -275,6 +276,20 @@ export default function Home() {
             />
           </div>
 
+          {/* CLICKABLE RESUME OVERLAY - Only shows when paused */}
+          {(scanState !== 'idle' || resultData !== null || confirming !== null) && (
+            <button className="resume-overlay" onClick={forceReset} title="Tap to scan again">
+              <div className="resume-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 4v6h-6"></path>
+                  <path d="M1 20v-6h6"></path>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                <span>Tap to Resume Scanning</span>
+              </div>
+            </button>
+          )}
+
           {/* CUSTOM CONFIRMATION OVERLAY */}
           {confirming && (
             <div id="confirm-overlay" className="show">
@@ -295,8 +310,8 @@ export default function Home() {
                     : `Are you sure you want to set ${confirming.name} back to Pending?`}
                 </div>
                 <div className="confirm-actions">
-                  <button className="confirm-btn-cancel" onClick={() => setConfirming(null)}>Cancel</button>
-                  <button className="confirm-btn-proceed" onClick={confirming.type === 'mark' ? executeManualMark : executeUnmark}>
+                  <button className="confirm-btn-cancel" onClick={(e) => { e.stopPropagation(); setConfirming(null); }}>Cancel</button>
+                  <button className="confirm-btn-proceed" onClick={(e) => { e.stopPropagation(); confirming.type === 'mark' ? executeManualMark() : executeUnmark(); }}>
                     {confirming.type === 'mark' ? 'Confirm' : 'Unmark'}
                   </button>
                 </div>
@@ -344,16 +359,13 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="status-bar">
-          <div className="status-dot"></div>
-          <span className="status-text">
-            {scanState === 'loading' ? 'Processing...' : resultData ? 'Result Displayed' : confirming ? 'Waiting for Confirmation' : 'Point camera at student\'s QR code'}
-          </span>
-          {(scanState !== 'idle' || resultData !== null || confirming !== null) && (
-            <button className="force-reset-btn" onClick={forceReset}>Resume</button>
-          )}
-        </div>
+      <div className="status-bar-outer">
+        <div className="status-dot"></div>
+        <span className="status-text">
+          {scanState === 'loading' ? 'Processing...' : (resultData || confirming) ? 'Tap scanner to resume' : 'Point camera at student\'s QR code'}
+        </span>
       </div>
 
       {/* STATS STRIP */}
@@ -382,9 +394,20 @@ export default function Home() {
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="text" id="student-search" placeholder="Search students by name..." value={search} onChange={e => setSearch(e.target.value)} />
+          <input
+            type="text"
+            id="student-search"
+            placeholder="Search students by name..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            ref={searchInputRef}
+          />
           {search && (
-            <button className="search-clear-btn" onClick={() => setSearch('')}>
+            <button
+              className="search-clear-btn"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => { setSearch(''); searchInputRef.current?.focus(); }}
+            >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
