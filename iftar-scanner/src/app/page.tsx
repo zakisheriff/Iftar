@@ -338,6 +338,9 @@ export default function Home() {
               <div className="frame-corner-br"></div>
               <div className="frame-corner-bl"></div>
             </div>
+            {scanState === 'idle' && !manualPaused && !resultData && !confirming && (
+              <div className="tap-pause-hint">Tap to pause</div>
+            )}
           </div>
 
           <div id="loading-overlay" className={scanState === 'loading' ? 'show' : ''}>
