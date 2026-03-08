@@ -52,7 +52,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchMasterList();
-    const interval = setInterval(fetchMasterList, 10000);
+    const interval = setInterval(fetchMasterList, 30000);
     return () => clearInterval(interval);
   }, []);
 
