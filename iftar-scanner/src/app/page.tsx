@@ -362,6 +362,7 @@ export default function Home() {
             <div className="result-name" style={{ fontSize: '13px', opacity: 0.75, marginTop: '2px' }}>
               {resultData?.iitId ? `IIT ID: ${resultData.iitId}` : ''}
             </div>
+            <div className="result-hint">Tap anywhere to resume</div>
           </div>
         </div>
       </div>
